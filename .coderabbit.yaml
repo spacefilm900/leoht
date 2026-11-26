@@ -1,0 +1,120 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+#
+# CodeRabbit configuration (schema v2; `version` omitted = v2).
+# Goal: every PR gets a review against the standards in docs/adr/0003-code-quality-standards.md.
+language: en-GB
+early_access: false
+
+reviews:
+  profile: assertive           # Rust standards matter more than review brevity here
+  high_level_summary: true
+  review_status: true
+  collapse_walkthrough: false
+  poem: false
+  sequence_diagrams: false
+  estimate_code_review_effort: true
+  suggested_labels: true
+  # Skip generated, vendored and binary-ish noise. Golden PNGs ARE reviewed by humans, not by the bot.
+  path_filters:
+    - "!target/**"
+    - "!Cargo.lock"
+    - "!**/*.snap"
+    - "!tests/golden/**"
+    - "!tests/fixtures/**/*.jpg"
+    - "!tests/fixtures/**/*.heic"
+    - "!tests/fixtures/**/*.png"
+    - "!LICENSE"
+
+  path_instructions:
+    - path: "crates/**/src/**/*.rs"
+      instructions: |
+        Library-code standards (ADR-0003). Flag every violation:
+        - No `unwrap()`, `expect()`, `panic!`, `todo!`, `unimplemented!` or indexing that can panic on untrusted input. Return typed errors (`thiserror`) instead.
+        - Every public item has a `///` doc comment saying what it does and, for fallible functions, a `# Errors` section.
+        - Files should stay under ~300 lines (hard limit 500). If a file mixes responsibilities, ask for a split into small, focused modules.
+        - Comments explain WHY, not what. Non-obvious algorithms, invariants and platform quirks must be commented.
+        - No `unsafe` (the workspace forbids it). No printing from library crates; use `tracing`.
+        - Paths are `camino` UTF-8 types or `leoht_core::RelPath`; never lossy `to_string_lossy` conversions.
+        - Never write, move or delete a user's original photo files. Edits go to sidecars only.
+    - path: "crates/leoht-core/**/*.rs"
+      instructions: |
+        This crate must stay UI-agnostic and I/O-free so a future Tauri or SwiftUI-over-FFI front-end can reuse it.
+        Reject any dependency on a UI toolkit, async runtime, database, or filesystem access here.
+    - path: "crates/leoht-catalog/**/*.rs"
+      instructions: |
+        The catalog is a rebuildable CACHE, never the source of truth. Reject storing user-authored data
+        (edits, ratings, tags, captions) only in SQLite. Schema changes must append a new migration; never edit an existing one.
+    - path: "crates/leoht-edit/**/*.rs"
+      instructions: |
+        Sidecar format is a public, versioned contract (ADR-0002). Any change to the JSON shape requires a
+        schema_version decision and a snapshot update. Writes must stay atomic (temp file + rename). Unknown fields must be preserved.
+    - path: "**/tests/**/*.rs"
+      instructions: |
+        Tests may use `unwrap`/`expect`. Check that tests are deterministic (no wall-clock, network or unseeded randomness),
+        use temporary directories, and assert behaviour rather than implementation. Golden-image tolerance changes need justification.
+    - path: "**/benches/**/*.rs"
+      instructions: "Benchmarks must be deterministic and use `std::hint::black_box`. Flag benchmarks that measure setup instead of the operation."
+    - path: ".github/workflows/**"
+      instructions: |
+        Actions must be pinned to a major version at minimum, use least-privilege `permissions`, and not expose secrets to
+        pull_request runs from forks. macOS (macos-14) and Linux must remain required; Windows stays non-blocking until Phase 6.
+    - path: "docs/adr/**"
+      instructions: "ADRs follow MADR: context, decision, consequences, status. Check the decision is actually stated, alternatives were considered, and consequences include downsides."
+    - path: "**/*.md"
+      instructions: |
+        Clean-room check: flag any text, screenshots or code that appear copied from Google Picasa, its binaries, or
+        its documentation beyond fair factual description. Flag uses of Google or Picasa trademarks as if they were ours.
+    - path: "CLEAN_ROOM.md"
+      instructions: "Changes here are legal-policy changes. Flag for human (Keith) review."
+    - path: "Cargo.toml"
+      instructions: |
+        New dependencies must be added to [workspace.dependencies] with a one-line justification, use a permissive licence
+        (cargo-deny), and be justified against the Phase's scope. GPL/LGPL/AGPL dependencies need an ADR first.
+
+  pre_merge_checks:
+    title:
+      mode: warning
+      requirements: "Conventional-commit style: type(scope): summary, e.g. feat(scan): detect HEIC files."
+    custom_checks:
+      - name: "Clean-room provenance"
+        mode: error
+        instructions: |
+          Fail if the PR adds test fixtures, images, data files or code snippets without a row in tests/fixtures/PROVENANCE.md
+          (for fixtures) or an obvious original authorship, or if it references decompiled or reverse-engineered proprietary software.
+      - name: "No destructive file operations"
+        mode: error
+        instructions: |
+          Fail if the PR adds code that deletes, overwrites, renames or modifies a user's original photo files
+          (as opposed to sidecars, caches, or the catalog) outside an explicit user-initiated export/save path.
+
+  auto_review:
+    enabled: true
+    drafts: false
+    auto_incremental_review: true
+    base_branches: ["main"]
+    ignore_title_keywords: ["WIP", "DO NOT REVIEW"]
+
+  tools:
+    clippy:
+      enabled: true
+    actionlint:
+      enabled: true
+    markdownlint:
+      enabled: true
+    yamllint:
+      enabled: true
+    gitleaks:
+      enabled: true
+    github-checks:
+      enabled: true
+
+chat:
+  auto_reply: true
+
+knowledge_base:
+  code_guidelines:
+    enabled: true
+    filePatterns:
+      - "docs/adr/0003-code-quality-standards.md"
+      - "CLEAN_ROOM.md"
+      - "CONTRIBUTING.md"

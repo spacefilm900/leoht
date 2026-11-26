@@ -1,0 +1,82 @@
+# Leoht workspace manifest.
+# Every dependency version lives in [workspace.dependencies]; crates opt in with
+# `foo.workspace = true`. Every crate inherits the lint policy below.
+[workspace]
+resolver = "3"
+members = ["crates/*", "xtask", "tests"]
+
+[workspace.package]
+version = "0.0.0"
+edition = "2024"
+# MSRV is set by the newest dependency requirement (notify 9 needs 1.91).
+rust-version = "1.91"
+license = "MIT"
+authors = ["Keith Haviland"]
+repository = "https://github.com/spacefilm900/leoht"
+publish = false
+
+[workspace.dependencies]
+# --- internal crates ---
+leoht-core = { path = "crates/leoht-core" }
+leoht-catalog = { path = "crates/leoht-catalog" }
+leoht-scan = { path = "crates/leoht-scan" }
+leoht-edit = { path = "crates/leoht-edit" }
+leoht-thumb = { path = "crates/leoht-thumb" }
+leoht-testkit = { path = "crates/leoht-testkit" }
+
+# --- runtime ---
+anyhow = "1.0"                      # application-level errors (cli, xtask only)
+blake3 = "1.8"                      # fast content hashing (identity across renames)
+camino = { version = "1.2", features = ["serde1"] } # UTF-8 paths: no lossy conversions
+clap = { version = "4.6", features = ["derive"] }
+ignore = "0.4"                      # directory walking + .leohtignore support
+image = { version = "0.25", default-features = false, features = ["jpeg", "png"] }
+kamadak-exif = "0.6"                # pure-Rust EXIF reader (lib name: `exif`)
+notify = "9.0"                      # fs watching (behind leoht-scan's `watch` feature)
+rusqlite = { version = "0.43", features = ["bundled"] } # embedded SQLite, sync
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "2.0"                   # typed errors in library crates
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# --- dev / test ---
+criterion = { version = "0.8", default-features = false, features = ["cargo_bench_support"] }
+insta = { version = "1.49", features = ["json"] }
+proptest = "1.12"
+tempfile = "3.27"
+
+# Deliberately NOT here yet (Phase 1+ decisions): rayon, libheif-rs, rawloader / libraw,
+# wgpu, egui/eframe, tract. See docs/adr and STATUS.md "Open questions".
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+missing_docs = "warn"
+rust_2018_idioms = { level = "warn", priority = -1 }
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+# Library code returns errors; it does not panic. Tests are exempt (clippy.toml).
+unwrap_used = "deny"
+expect_used = "warn"
+dbg_macro = "deny"
+todo = "deny"
+unimplemented = "deny"
+# Libraries log via `tracing`; only the CLI/xtask binaries may print.
+print_stdout = "warn"
+print_stderr = "warn"
+# Style choices we do not want to fight about.
+module_name_repetitions = "allow"
+
+[profile.dev]
+# Debug-built image codecs are painfully slow; optimise dependencies only.
+# Our own crates stay at opt-level 0 for fast compiles and good debugging.
+
+[profile.dev.package."*"]
+opt-level = 2
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = "debuginfo"

@@ -1,0 +1,3 @@
+[alias]
+# `cargo xtask <cmd>` runs repo automation (see xtask/src/main.rs).
+xtask = "run --quiet --package xtask --"

@@ -1,0 +1,31 @@
+# Phase gates and human-in-the-loop
+
+**GitHub Issues and Pull Requests are the coordination surface.** Tasks are issues, work is PRs, decisions needing Keith are
+issues labelled `human-gate`. Chat messages are not the record; issues and PRs are.
+
+## How a gate works
+1. Master opens a `human-gate` issue (template provided) stating the decision, options and a recommendation.
+2. Dependent work stops. Agents do not work around a gate.
+3. Keith closes the issue (or approves the PR) with his decision; Master records it in `STATUS.md` and, if architectural, in an ADR.
+
+## Gates
+| Gate | When | Needs |
+|------|------|-------|
+| G0a Trademark / name clearance | Before the public repo is created or named | Keith (USPTO, EUIPO, domains, common-law searches; possibly counsel) |
+| G0b Create public repo, enable CodeRabbit, branch protection | After G0a | Keith (Master prepares the exact steps) |
+| G0c ADR approval | Before Phase 1 starts | Keith approves ADR-0001…0004 |
+| G1 Phase 1 entry | After scaffold CI is green on `main` | See "Phase 1 entry criteria" in the proposal |
+| G1x Phase 1 exit | CLI demo + 1k/10k volume baselines recorded | Keith |
+| G-legal HEIC/HEVC patent review | Before distributing any binary that decodes HEIC | Keith / counsel |
+| Gn Phase N exit | Each phase | Keith reviews narrative, tests and demo |
+
+## Phase exit checklist (every phase)
+- [ ] Working code merged; CI green on macOS and Linux
+- [ ] Tests at the right levels (unit, integration, golden/perf/volume where the phase calls for them)
+- [ ] ADRs written/updated; `STATUS.md` current
+- [ ] "How we built X" narrative in `narratives/`
+- [ ] Keith's sign-off recorded on the exit issue
+
+## CI policy by platform
+macOS (macos-14, Apple Silicon) and Linux are required checks. Windows runs but is non-blocking until Phase 6.
+Volume tests: 1k and 10k synthetic photos from Phase 1; the 100k suite is Phase 6.

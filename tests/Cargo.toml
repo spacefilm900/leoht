@@ -1,0 +1,41 @@
+# Workspace-level integration, golden-image and volume tests.
+# These live in their own package so they can depend on *every* crate and
+# exercise them together, the way a front-end would.
+[package]
+name = "leoht-it"
+description = "Cross-crate integration, golden-image and volume tests."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+publish.workspace = true
+# Test files sit directly in this folder rather than in a nested tests/ dir.
+autotests = false
+
+[[test]]
+name = "end_to_end"
+path = "end_to_end.rs"
+
+[[test]]
+name = "golden"
+path = "golden.rs"
+
+[[test]]
+name = "volume"
+path = "volume.rs"
+
+[dev-dependencies]
+leoht-core.workspace = true
+leoht-catalog.workspace = true
+leoht-scan.workspace = true
+leoht-edit.workspace = true
+leoht-thumb.workspace = true
+leoht-testkit.workspace = true
+camino.workspace = true
+image.workspace = true
+tempfile.workspace = true
+
+[lints]
+workspace = true

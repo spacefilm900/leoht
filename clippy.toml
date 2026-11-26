@@ -1,0 +1,14 @@
+# Clippy tuning. Lint *levels* live in Cargo.toml ([workspace.lints]);
+# this file only holds lint *thresholds* and test exemptions.
+
+# `unwrap`/`expect`/`panic` are denied in library code but are idiomatic in tests.
+allow-unwrap-in-tests = true
+allow-expect-in-tests = true
+allow-panic-in-tests = true
+
+# Keep functions short enough to read in one screen.
+too-many-lines-threshold = 80
+
+# Words that are proper nouns / acronyms, not code, in doc comments.
+# ".." keeps clippy's built-in list (e.g. "GitHub", "macOS").
+doc-valid-idents = ["SQLite", "EXIF", "HEIC", "XMP", "ADR", "JSON", "Leoht", "SplitMix64", "SwiftUI", "Tauri", "BLAKE3", "FFI", "UTF-8", "TIFF", "WebP", "PNG", "JPEG", "HEIF", "RAW", "..", ]

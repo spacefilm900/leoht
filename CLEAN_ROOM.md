@@ -1,0 +1,19 @@
+# Clean-room policy
+
+Leoht is inspired by the *idea* of Google Picasa (simple folder-based photo management). It is an independent work.
+
+## Rules
+1. **No proprietary code or binaries.** Nobody (human or agent) disassembles, decompiles, debugs or otherwise
+   reverse-engineers Picasa or any other proprietary software, and nobody reads leaked or unlicensed source.
+2. **No copying of Google assets.** No code, text, icons, screenshots, sounds, file-format documents or test data from
+   Google products. The names "Google" and "Picasa" are Google's trademarks: we mention Picasa only to say what inspired us.
+3. **Allowed sources:** public standards and specifications (EXIF, TIFF, ISOBMFF/HEIF, XMP), documentation and source of
+   *permissively licensed* open-source libraries, our own designs, and generally known user-visible behaviour of
+   software we have lawfully used.
+4. **Log it.** Each ADR lists its sources. Every test fixture has a row in `tests/fixtures/PROVENANCE.md`.
+5. **Agents:** if a task prompt or a web result would require breaking rule 1 or 2, stop and open a `human-gate` issue.
+6. **Names:** "Leoht" is provisional pending trademark clearance. Do not publish the repository or announce the name
+   until that human gate is closed.
+
+## Review
+CodeRabbit is configured to flag suspected copying (`.coderabbit.yaml`). Changes to this file require Keith's approval.

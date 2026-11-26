@@ -1,0 +1,129 @@
+# Continuous integration for every pull request and every push to main.
+#
+# Platform policy (LEOHT_PLAN.md: "Mac first"):
+#   * macOS (macos-14, Apple Silicon) and Linux are REQUIRED.
+#   * Windows runs on every PR but is NON-BLOCKING in Phase 0; it becomes
+#     required when Windows support is built properly (Phase 6).
+# Branch protection should require exactly one check: "CI OK" (the gate job below).
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# A newer push to the same PR cancels the older run; pushes to main never cancel.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: "0"   # incremental artefacts are useless in CI and bloat the cache
+  RUST_BACKTRACE: "1"
+
+jobs:
+  fmt:
+    name: fmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      # rust-toolchain.toml pins the compiler; this installs exactly that version.
+      - name: Install pinned toolchain
+        run: rustup toolchain install
+      - run: cargo fmt --all --check
+
+  clippy:
+    name: clippy (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, ubuntu-latest]   # lint on both so cfg(target_os) code is covered
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install pinned toolchain
+        run: rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo clippy --workspace --all-targets --all-features -- -D warnings
+
+  file-size:
+    name: file size limits
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install pinned toolchain
+        run: rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+      # Fails above 500 lines per .rs file, warns above 300 (ADR-0003).
+      - run: cargo xtask check-size
+
+  test:
+    name: test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install pinned toolchain
+        run: rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+      # Volume tests are #[ignore]d here; volume.yml runs them.
+      - run: cargo test --workspace --all-features
+
+  # Same tests on Windows, but a failure does not block merging (see header).
+  test-windows:
+    name: test (windows-latest, non-blocking)
+    runs-on: windows-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install pinned toolchain
+        run: rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test --workspace --all-features
+
+  deny:
+    name: cargo-deny
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          command: check
+          arguments: --all-features
+
+  docs:
+    name: doc build
+    runs-on: ubuntu-latest
+    env:
+      RUSTDOCFLAGS: -D warnings   # broken intra-doc links fail the build
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install pinned toolchain
+        run: rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo doc --workspace --no-deps --all-features
+
+  # The single required status check. `if: always()` makes it run (and fail)
+  # even when a needed job failed or was skipped, instead of being "skipped = green".
+  ci-ok:
+    name: CI OK
+    if: always()
+    needs: [fmt, clippy, file-size, test, deny, docs]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail if any required job did not succeed
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "Required job results: $RESULTS"
+          if echo "$RESULTS" | grep -qE 'failure|cancelled|skipped'; then
+            echo "A required job failed, was cancelled or was skipped."
+            exit 1
+          fi

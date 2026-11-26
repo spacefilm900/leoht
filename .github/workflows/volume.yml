@@ -1,0 +1,53 @@
+# Volume tests: scan + hash + index a large synthetic library, and report timings.
+#
+# STUB for Phase 0: the job is wired up and runs, but there are no pass/fail
+# time budgets yet. Phase 1 targets: synthetic 1k and 10k photos, with budgets
+# recorded from the first baseline. The 100k suite belongs to Phase 6.
+# Never part of the required PR checks: it is slow and runs nightly/on demand.
+name: Volume
+
+on:
+  schedule:
+    - cron: "17 3 * * *"       # nightly, 03:17 UTC
+  workflow_dispatch:
+    inputs:
+      count:
+        description: "Number of synthetic photos to generate"
+        required: true
+        default: "10000"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: volume-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: "0"
+  # Scheduled runs have no inputs, so fall back to 10k.
+  VOLUME_COUNT: ${{ github.event.inputs.count || '10000' }}
+
+jobs:
+  volume:
+    name: volume (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install pinned toolchain
+        run: rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+      - name: Generate synthetic library
+        run: cargo xtask gen-library --count "$VOLUME_COUNT" --out target/volume-library
+      - name: Run ignored volume tests
+        # Absolute path: cargo runs the test from the package folder, not the repo root.
+        run: >
+          cargo test -p leoht-it --test volume --release -- --ignored --nocapture
+        env:
+          LEOHT_VOLUME_LIBRARY: ${{ github.workspace }}/target/volume-library
