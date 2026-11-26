@@ -1,7 +1,8 @@
 # Leoht
 
-> **Working title.** "Leoht" is Old English for *light*. Trademark clearance (USPTO, EUIPO, domains, common-law)
-> is **pending**; the name and the repository name `leoht` are provisional until a human gate clears them.
+> **Working title.** "Leoht" (Old English for *light*) is a working title. **Full trademark clearance
+> (USPTO, EUIPO, domains, common-law) is still pending**, so the project name and this repository's name
+> may change. Please don't build branding around it yet.
 
 A modern, **folder-first**, **non-destructive** photo organiser and light editor in Rust, inspired by the simplicity of
 Google Picasa. Mac first, then Linux and Windows. Your folders are the source of truth; edits live in small

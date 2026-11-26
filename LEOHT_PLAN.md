@@ -118,3 +118,4 @@ This project is deliberately designed to be a transparent, reproducible example 
 ---
 **Changelog**
 - 2026-11-26: Phase 1 format matrix added under Phase 1 (Keith's request); see ADR-0004. Replaced the earlier condensed working copy with the full plan text; no other wording changed.
+- 2026-11-26: Public repository `spacefilm900/leoht` created with Keith's approval while "Leoht" is still a working title; full trademark clearance (USPTO, EUIPO, domains, common-law) is still pending and the name/repo may change.
