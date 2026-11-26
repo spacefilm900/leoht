@@ -11,6 +11,9 @@ issues labelled `human-gate`. Chat messages are not the record; issues and PRs a
 ## Gates
 | Gate | When | Needs |
 |------|------|-------|
+| Gx-arch Architecture review | Whenever an ADR is proposed | Keith approves the ADR PR |
+| Gx-ux UX review | From Phase 2 (viewer/grid) onwards, and before Mac polish (Phase 5) | Keith |
+| Gx-privacy Legal/privacy review | Before face recognition or any sharing/export feature (Phase 6+) | Keith |
 | G0a Trademark / name clearance | Before the public repo is created or named | Keith (USPTO, EUIPO, domains, common-law searches; possibly counsel) |
 | G0b Create public repo, enable CodeRabbit, branch protection | After G0a | Keith (Master prepares the exact steps) |
 | G0c ADR approval | Before Phase 1 starts | Keith approves ADR-0001…0004 |

@@ -47,5 +47,6 @@ before Phase 3 builds the edit engine, because the format becomes a public, long
 * Good: JSON is trivial to read from any front-end (egui now; Tauri/SwiftUI later).
 * Bad: more small files in photo folders (mitigated: only for edited photos; cloud-sync clients handle small files well).
 * Bad: sidecars can be orphaned by external renames/deletes; a "repair" scan using `source_hash` is a Phase 3 task.
+* Note: the plan's edit list is open-ended ("crop, rotate, …, red-eye, etc."). Adding a new operation changes what a reader must understand, so it bumps `schema_version`; an older reader then refuses the file instead of silently dropping an edit.
 * Follow-up: Phase 4 decides whether stars/captions/tags live in this same sidecar (likely, as optional fields) —
   the unknown-field preservation rule already makes that safe to add.

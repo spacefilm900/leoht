@@ -19,4 +19,5 @@
 2. Worker branches `phase-N/...`, writes tests first where practical, implements, runs `cargo xtask ci`.
 3. Worker opens a PR; CodeRabbit reviews; worker fixes; CI green.
 4. Master reviews against `review-checklist.md`, merges (squash), updates `STATUS.md`, adds a line to the phase narrative.
-5. Anything needing a human decision becomes a `human-gate` issue and work that depends on it stops.
+5. Record the prompt/brief used, any iterations and any surprises in the phase narrative's working notes (the plan: "document every decision, prompt pattern, failure, and lesson").
+6. Anything needing a human decision becomes a `human-gate` issue and work that depends on it stops.
