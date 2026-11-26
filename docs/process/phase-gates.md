@@ -30,5 +30,5 @@ issues labelled `human-gate`. Chat messages are not the record; issues and PRs a
 - [ ] Keith's sign-off recorded on the exit issue
 
 ## CI policy by platform
-macOS (macos-14, Apple Silicon) and Linux are required checks. Windows runs but is non-blocking until Phase 6.
+macOS (macos-15, Apple Silicon) and Linux are required checks. Windows runs but is non-blocking until Phase 6.
 Volume tests: 1k and 10k synthetic photos from Phase 1; the 100k suite is Phase 6.

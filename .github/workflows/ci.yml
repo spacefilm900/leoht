@@ -1,7 +1,7 @@
 # Continuous integration for every pull request and every push to main.
 #
 # Platform policy (LEOHT_PLAN.md: "Mac first"):
-#   * macOS (macos-14, Apple Silicon) and Linux are REQUIRED.
+#   * macOS (macos-15, Apple Silicon; macos-14 was retired by GitHub on 2026-11-02) and Linux are REQUIRED.
 #   * Windows runs on every PR but is NON-BLOCKING in Phase 0; it becomes
 #     required when Windows support is built properly (Phase 6).
 # Branch protection should require exactly one check: "CI OK" (the gate job below).
@@ -42,7 +42,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-14, ubuntu-latest]   # lint on both so cfg(target_os) code is covered
+        os: [macos-15, ubuntu-latest]   # lint on both so cfg(target_os) code is covered
     steps:
       - uses: actions/checkout@v7
       - name: Install pinned toolchain
@@ -67,14 +67,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-14, ubuntu-latest]
+        os: [macos-15, ubuntu-latest]
     steps:
       - uses: actions/checkout@v7
       - name: Install pinned toolchain
         run: rustup toolchain install
       - uses: Swatinem/rust-cache@v2
       # Volume tests are #[ignore]d here; volume.yml runs them.
-      - run: cargo test --workspace --all-features
+      - run: cargo test --workspace --all-features --no-fail-fast
 
   # Same tests on Windows, but a failure does not block merging (see header).
   test-windows:
@@ -86,7 +86,7 @@ jobs:
       - name: Install pinned toolchain
         run: rustup toolchain install
       - uses: Swatinem/rust-cache@v2
-      - run: cargo test --workspace --all-features
+      - run: cargo test --workspace --all-features --no-fail-fast
 
   deny:
     name: cargo-deny

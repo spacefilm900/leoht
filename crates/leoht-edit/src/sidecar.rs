@@ -128,7 +128,9 @@ mod tests {
     #[test]
     fn sidecar_path_keeps_the_full_file_name() {
         let p = sidecar_path_for(Utf8Path::new("lib/2020/IMG_1.jpg"));
-        assert_eq!(p.as_str(), "lib/2020/IMG_1.jpg.leoht.json");
+        // Compare components, not the string: Windows joins with `\\`, Unix with `/`.
+        assert_eq!(p.file_name(), Some("IMG_1.jpg.leoht.json"));
+        assert_eq!(p.parent(), Some(Utf8Path::new("lib/2020")));
     }
 
     fn utf8_tmp(dir: &tempfile::TempDir) -> Utf8PathBuf {

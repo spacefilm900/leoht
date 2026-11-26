@@ -57,7 +57,7 @@ reviews:
     - path: ".github/workflows/**"
       instructions: |
         Actions must be pinned to a major version at minimum, use least-privilege `permissions`, and not expose secrets to
-        pull_request runs from forks. macOS (macos-14) and Linux must remain required; Windows stays non-blocking until Phase 6.
+        pull_request runs from forks. macOS (macos-15) and Linux must remain required; Windows stays non-blocking until Phase 6.
     - path: "docs/adr/**"
       instructions: "ADRs follow MADR: context, decision, consequences, status. Check the decision is actually stated, alternatives were considered, and consequences include downsides."
     - path: "**/*.md"
