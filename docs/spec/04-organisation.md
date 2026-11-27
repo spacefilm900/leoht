@@ -5,14 +5,14 @@ focused core. Vocabulary: [`functional-spec.md`](functional-spec.md#2-how-to-rea
 
 ## Rate, cull, caption and tag (FR-RAT)
 
-### FR-RAT-01 Star ratings and favourites
-*Phase 4 · Core · Traces: ORG-06*
-One key stars a photo as a favourite; ratings of 0 to 5 are available; a filter shows starred or rated photos. Ratings are stored in the sidecar.
+### FR-RAT-01 Star ratings, 0 to 5
+*Phase 4 · Core · Traces: ORG-06, SQ-4 (Keith decision, 2026-11-27)*
+The rating model is 0 to 5 stars plus a reject flag (FR-RAT-02), set independently. One key sets each rating; a filter shows photos at or above a rating. Ratings are stored in the sidecar.
 - **Auto** (`ui`, `integration`): key sequences set the expected ratings; a rating survives deleting the database (FR-FND-02).
 
 ### FR-RAT-02 Culling mode
 *Phase 4 · Core · Traces: ADD-02*
-In the full-screen viewer (FR-BRW-09) single keys star, reject or clear a photo, with optional auto-advance after a decision. Decisions are saved to sidecar data, never by touching or moving files, and survive a crash.
+In the full-screen viewer (FR-BRW-09) single keys set a star rating, reject or clear a photo, with optional auto-advance after a decision. Decisions are saved to sidecar data, never by touching or moving files, and survive a crash.
 - **Auto** (`ui`, `perf`, `integration`): `egui_kittest` key sequences assert the resulting ratings and flags; next-image latency stays within budget; atomic-write test; kill-and-restart test that decisions survive.
 - **Judge** (Gt-RAT): cull the 60-photo sample shoot to a 10-photo selection; record time taken, any missed or wrong keypress, and "would you use this for a real shoot?" (yes, maybe, no).
 

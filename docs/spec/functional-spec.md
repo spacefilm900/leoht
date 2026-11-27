@@ -1,6 +1,6 @@
 # Leoht functional specification
 
-* Status: **Draft for Keith's review.** Requirements are proposed, not approved. Nothing here changes `LEOHT_PLAN.md` or ADR-0001 to ADR-0005 (approved "for now"); it links to them.
+* Status: **Reviewed by Keith on 2026-11-27 (PR #3); his decisions are applied in section 8.** Requirements are the agreed starting point, to be refined by trials and phase-exit calibration. Open items are listed in section 8 (OQ-2 to OQ-6 and SQ-3 stay as defaults that may be revisited). Nothing here changes `LEOHT_PLAN.md` or ADR-0001 to ADR-0005 (approved "for now"); it links to them.
 * Date: 2026-11-27
 * Author: Leoht Master (agent), for Keith Haviland (owner)
 * Input: the merged [Picasa feature inventory](../research/picasa-feature-inventory.md) and its [source log](../research/sources.md)
@@ -36,7 +36,7 @@ needs) or **Widening** (anything beyond the core, which starts only after gate G
 3 edit engine, 4 organisation, 5 Mac polish and packaging, 6+ later. One requirement has one phase; where the inventory
 splits a feature across phases it becomes two requirements.
 
-**Priority.** Core, Foundation or Widening, as above. Keith may rebalance them (SQ-3).
+**Priority.** Core, Foundation or Widening, as above. Keith may rebalance them (SQ-3; defaults applied, may revisit).
 
 **Checks.** `Auto` means a machine check that runs in CI; the tag in brackets names its kind. `Judge` means a human
 judgement check, run by Keith in the named trial.
@@ -85,7 +85,7 @@ feedback, a first result within 5 minutes, easy removal, feature-flagged where a
 <!-- groups:start -->
 | Group | Name | Trial | Phase | Reqs | Core | Foundation | Widening | File |
 |---|---|---|---|---:|---:|---:|---:|---|
-| FR-FND | Foundations and guarantees | Checked in every trial (no trial of its own) | 1, 2, 3 | 13 | 0 | 13 | 0 | [01-foundations.md](01-foundations.md) |
+| FR-FND | Foundations and guarantees | Checked in every trial (no trial of its own) | 1, 2, 3 | 14 | 0 | 14 | 0 | [01-foundations.md](01-foundations.md) |
 | FR-LIB | Library, scan and index | Gt-LIB (CLI, at Phase 1 exit) | 1 | 10 | 0 | 10 | 0 | [02-library-and-viewing.md](02-library-and-viewing.md) |
 | FR-BRW | Browse and view | Gt-BRW (**proposed first trial**) | 2 | 11 | 10 | 1 | 0 | [02-library-and-viewing.md](02-library-and-viewing.md) |
 | FR-ENG | Edit engine, save and export | Gt-CRP (ships with crop; FR-ENG-10 excluded until after Gf) | 3 | 11 | 7 | 3 | 1 | [03-editing.md](03-editing.md) |
@@ -96,7 +96,7 @@ feedback, a first result within 5 minutes, easy removal, feature-flagged where a
 | FR-FIL | Files, folders, duplicates and stacks | Gt-FIL | 4 | 8 | 6 | 2 | 0 | [04-organisation.md](04-organisation.md) |
 | FR-MAC | Mac polish and sharing | Gt-MAC | 5 | 8 | 3 | 2 | 3 | [05-mac-polish-and-later.md](05-mac-polish-and-later.md) |
 | FR-LAT | Later phases (outline) | One trial per later group at phase entry | 6 | 14 | 0 | 2 | 12 | [05-mac-polish-and-later.md](05-mac-polish-and-later.md) |
-| **Total** | | | | **106** | **52** | **37** | **17** | |
+| **Total** | | | | **107** | **52** | **38** | **17** | |
 <!-- groups:end -->
 
 ### Requirements per phase
@@ -104,7 +104,7 @@ feedback, a first result within 5 minutes, easy removal, feature-flagged where a
 <!-- phases:start -->
 | Group | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Phase 5 | Phase 6 | Total |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| FR-FND | 8 | 3 | 2 |  |  |  | 13 |
+| FR-FND | 9 | 3 | 2 |  |  |  | 14 |
 | FR-LIB | 10 |  |  |  |  |  | 10 |
 | FR-BRW |  | 11 |  |  |  |  | 11 |
 | FR-ENG |  |  | 11 |  |  |  | 11 |
@@ -115,7 +115,7 @@ feedback, a first result within 5 minutes, easy removal, feature-flagged where a
 | FR-FIL |  |  |  | 8 |  |  | 8 |
 | FR-MAC |  |  |  |  | 8 |  | 8 |
 | FR-LAT |  |  |  |  |  | 14 | 14 |
-| **Total** | **18** | **14** | **29** | **22** | **8** | **15** | **106** |
+| **Total** | **19** | **14** | **29** | **22** | **8** | **15** | **107** |
 <!-- phases:end -->
 
 ### Proposed first trial: Gt-BRW (browse and view)
@@ -135,8 +135,8 @@ Pass rule: each `Judge` check in FR-BRW-01 to -09 answered at least "OK", and no
 Suggested dry run: at the Phase 1 exit, a CLI-only **Gt-LIB** trial (one command, bundled samples) rehearses the
 packaging and feedback pipeline before the first graphical trial depends on it.
 
-Constraints to settle first: a trial binary that decodes HEIC would need the G-legal review (ADR-0004), so the first trials
-should ship JPEG and PNG samples with HEIC decoding compiled out (SQ-1); sample photos need a recorded source and licence (SQ-6);
+Constraints: a trial binary that decodes HEIC would need the G-legal review (ADR-0004), so the first trials
+ship JPEG and PNG samples with HEIC decoding compiled out (SQ-1, decided by Keith 2026-11-27, to be revisited after G-legal); the sample photos come from Keith, who will supply them, and the slot stays open until he does (SQ-6);
 an unsigned build needs the one-line Gatekeeper step in the checklist (T4).
 
 ### Trial sequence and the focused core
@@ -179,28 +179,33 @@ Core Principle 6 sets the order: Gt-BRW, Gt-CRP (engine, crop and geometry; FR-E
   [ADR-0003](../adr/0003-code-quality-standards.md), [ADR-0004](../adr/0004-image-format-support-strategy.md),
   [ADR-0005](../adr/0005-licensing-and-commercial-readiness.md)).
 
-## 8. Open questions for Keith
+## 8. Decisions and open questions
 
-These are **not decided**. Each has a recommended default that the specification applies (and marks) until Keith decides.
+### Resolved by Keith, 2026-11-27
 
-| ID | Question | Recommended default (applied in the spec) | Requirements affected |
+| ID | Decision | Applied in |
+|---|---|---|
+| OQ-1 | Picasa metadata import is a read-only importer, Phase 6 or later, gated on a legal review (gate G-import). | FR-LAT-01; inventory OQ-1 |
+| SQ-1 | Accepted for now: trial builds exclude HEIC decoding, and trials use JPEG and PNG samples only. To be revisited later (after the G-legal review). | FR-LIB-04, section 4 |
+| SQ-2 | Performance targets in FR-FND-07 are **accepted as starting points** (still framed as proposed targets) and are calibrated against reality: baselines from Phase 1, recalibration proposed at every phase exit. | FR-FND-07, FR-FND-13 |
+| SQ-4 | Rating model: 0 to 5 stars plus a reject flag. | FR-RAT-01, FR-RAT-02 |
+| SQ-5 | Minimum macOS 15 (Sequoia), Apple Silicon only. This matches CI (`macos-15`). | FR-FND-11 |
+| SQ-6 | Keith will supply the sample photos himself. They will be published under the repository licence (MIT), and GPS and personal metadata must be stripped before commit. The slot stays open until he provides them. | FR-FND-14 |
+
+### Open: default applied, may revisit
+
+Keith did not object to these on 2026-11-27, so the recommended default stays applied and marked in the spec. Any of them can still be changed.
+
+| ID | Question | Default applied | Requirements affected |
 |---|---|---|---|
 | OQ-2 | Principle 1 versus writing tags, captions and coordinates into originals. | Sidecar by default; explicit, warned opt-in write-back to files, shipped after the focused core. | FR-RAT-05, FR-RAT-07, FR-LAT-06 |
 | OQ-3 | Where does import live? The plan has no import phase. | A minimal, hash-verified import at the start of Phase 6, right after Gf, because import is not part of the focused core. Keith may pull it into late Phase 4. | FR-LAT-02 |
 | OQ-4 | Slideshow and quick viewer: which phase? | Phase 5 with Mac polish, tagged Widening, so they wait for Gf. | FR-MAC-06, FR-MAC-07 |
 | OQ-5 | Effects and presets: which to ship? | Core tone controls and a handful of looks in Phase 3; shareable preset files later; no novelty looks. | FR-ADJ-07 |
 | OQ-6 | Positioning against the peer projects Dalica and Picco. | The case-study positioning in section 1 stands as the project's purpose. Toward the peers: differentiate on testing rigour, a transparent process and Mac-native polish; study their public behaviour only within licence terms, copy no code. | Section 1 |
+| SQ-3 | Are the Core, Foundation and Widening tags right? In particular duplicates and stacks (FR-FIL-06 to -08) are tagged Core. | As tagged; Keith may move items behind Gf. | All priority tags |
 
-Specification-level questions raised while writing it (also open, each with a recommended default):
-
-| ID | Question | Recommended default |
-|---|---|---|
-| SQ-1 | Is a trial build given only to Keith "distribution" under ADR-0004's HEIC legal gate? | Treat it as distribution until counsel says otherwise: first trials ship with HEIC decoding compiled out and JPEG and PNG samples. A HEIC trial follows G-legal. |
-| SQ-2 | Confirm the performance targets in FR-FND-07. | Proposed numbers stand; Phase 1 records baselines on the CI Mac and Keith confirms or changes them at gate G1x. |
-| SQ-3 | Are the Core, Foundation and Widening tags right? In particular duplicates and stacks (FR-FIL-06 to -08) are tagged Core. | As tagged; Keith may move items behind Gf. |
-| SQ-4 | Rating model: 0 to 5 stars plus a reject flag, or a single favourite star? | 0 to 5 stars, a reject flag, and one key for "favourite" (FR-RAT-01, -02). |
-| SQ-5 | Minimum supported macOS version. | The current and the previous major release, decided in Phase 5. |
-| SQ-6 | Source of the bundled sample photos. | Public-domain or permissively licensed photos, or Keith's own cleared photos, recorded in `tests/fixtures/PROVENANCE.md`; synthetic images only for tests. |
+The G-import gate in [`phase-gates.md`](../process/phase-gates.md) stands as written.
 
 ## 9. Clean-room discipline
 
@@ -223,6 +228,6 @@ Recorded so Keith and the architecture gate can see them. None are changed here.
 1. **ADR-0001 operation set.** Flip, perspective, highlights and shadows, temperature, sharpen and the looks are new operations beyond the fixed Phase 3 list. Under ADR-0002 each bumps `schema_version`. Needs an ADR update or a follow-up ADR before Phase 3.
 2. **ADR-0002 optional fields.** Ratings, flags, captions, tags, hidden flag, stack overrides and custom folder order need sidecar fields (the ADR already notes the follow-up). A new ADR should fix them, including the folder sort key.
 3. **ADR-0001 album location** is finalised in Phase 4 as the ADR says (FR-ALB-03).
-4. **ADR-0004 and ADR-0005:** the RAW decoder licence choice gates FR-ENG-10; HEIC distribution gates trials (SQ-1).
+4. **ADR-0004 and ADR-0005:** the RAW decoder licence choice gates FR-ENG-10; HEIC distribution gates trials, so trial builds exclude HEIC decoding (SQ-1, decided).
 5. **New ADRs likely needed:** colour pipeline (ICC, Display P3, HDR; FR-BRW-06, FR-MAC-04); UI toolkit accessibility, after the Phase 2 spike (FR-FND-06); the stacks and duplicates model (FR-FIL-07); the Picasa importer (FR-LAT-01), only after its review.
 6. **ADR-0003:** the performance budgets (FR-FND-07) and the phase-exit quality-report check (FR-FND-13) are new automation for `cargo xtask`.

@@ -4,8 +4,8 @@ Cross-cutting requirements. They are not a trial of their own: every trial (Gt) 
 Format and vocabulary are explained in [`functional-spec.md`](functional-spec.md#2-how-to-read-this-specification).
 
 **Reference machines.** *CI Mac* means the `macos-15` Apple Silicon runner. *Keith's Mac* means his Apple Silicon Mac used
-in trials. Performance numbers below are **proposed targets**: Phase 1 records baselines on the CI Mac, then Keith confirms
-or changes them (SQ-2).
+in trials. Performance numbers below are **proposed targets that Keith accepted as starting points on 2026-11-27** (SQ-2). They are
+calibrated against reality: Phase 1 records baselines on the CI Mac, and each phase exit recalibrates them (FR-FND-13).
 
 ### FR-FND-01 Originals are never modified
 *Phase 1 · Foundation · Traces: FUT-12, LIB-10, ADR-0002*
@@ -65,7 +65,7 @@ least 4.5:1 (our own target; the common AA level), text honours the system size 
 
 ### FR-FND-07 Performance budgets by library size
 *Phase 1 · Foundation · Traces: MOD-12, FUT-05, FUT-06, ORG-10, VIEW-01*
-Leoht meets these budgets (p95 unless stated) on the CI Mac, and feels right on Keith's Mac. They are proposed targets.
+Leoht meets these budgets (p95 unless stated) on the CI Mac, and feels right on Keith's Mac. They are proposed targets, accepted by Keith as starting points on 2026-11-27 (SQ-2) and recalibrated at each phase exit from measured baselines.
 
 | Metric | 1k photos | 10k photos | 100k photos |
 |---|---|---|---|
@@ -82,7 +82,7 @@ Size-independent: app launch to window 2 s; lightbox next image (preloaded) 50 m
 edit preview update while dragging a slider 50 ms; export of one 12-megapixel JPEG 2 s; paste of an edit onto 1,000 photos 10 s.
 - **Auto** (`perf`, `volume`): `criterion` benchmarks and deterministic synthetic libraries (`cargo xtask gen-library`)
   enforce the 1k and 10k columns in CI from Phase 1 (rows for features that do not exist yet, such as live search from Phase 4, join the check when their phase delivers them). The 100k column runs in a scheduled volume job from Phase 6 (plan and
-  ADR-0003). A regression of more than 25% against the recorded baseline fails the check.
+  ADR-0003). A regression of more than 25% against the recorded baseline fails the check. Changing a budget is a reviewed PR that cites the measured baselines, never a silent edit.
 - **Judge** (each trial): "does it feel fast?" answered fast, OK or slow; "slow" opens a performance issue even if the budget passes.
 
 ### FR-FND-08 Private and offline by default
@@ -107,9 +107,12 @@ Folder and file names with any Unicode, spaces, very long paths and case differe
 
 ### FR-FND-11 Platform
 *Phase 1 · Foundation · Traces: META-07*
-macOS on Apple Silicon is the supported and required-CI platform; Linux is required in CI; Windows builds are non-blocking
-until Phase 6 (see `docs/process/phase-gates.md`). The supported macOS versions are decided in Phase 5 (SQ-5).
-- **Auto:** CI matrix as defined in `.github/workflows/ci.yml`; the required checks include `macos-15`.
+Leoht supports **macOS 15 (Sequoia) or later on Apple Silicon only** (decided by Keith, 2026-11-27, SQ-5); there is no Intel build.
+This matches CI, which runs on `macos-15`. Linux stays in CI for the portable crates and Windows builds are non-blocking
+until Phase 6 (see `docs/process/phase-gates.md`).
+- **Auto:** CI matrix as defined in `.github/workflows/ci.yml`; the required checks include `macos-15`; the app bundle sets a
+  minimum system version of 15.0 and contains an arm64 slice only (checked on the built bundle from Phase 5).
+- **Auto** (`unit`): on an unsupported macOS version or architecture the app shows a clear message instead of crashing (where the platform allows launching at all).
 
 ### FR-FND-12 Strings ready for translation
 *Phase 2 · Foundation · Traces: META-06*
@@ -118,7 +121,19 @@ All user-visible text lives in one string module (no literals in UI code), so tr
 
 ### FR-FND-13 Quality is measured and the story is honest
 *Phase 1 · Foundation · Traces: Positioning (inventory)*
-Each phase exit publishes a short quality report (test counts by level, benchmarks against the FR-FND-07 budgets,
-golden-image changes, open defects, trial verdicts) and a "How we built X" narrative with a section on what went wrong.
+Each phase exit publishes a short quality report (test counts by level, benchmarks against the FR-FND-07 budgets
+with a proposed recalibration of those budgets from the measured baselines, golden-image changes, open defects, trial verdicts) and a "How we built X" narrative with a section on what went wrong.
 - **Auto** (`integration`): a `cargo xtask` check fails the phase-exit PR if the report or the "what went wrong" heading is missing.
 - **Judge** (Gn): Keith reviews the report and the narrative at the phase gate.
+
+### FR-FND-14 Sample photos are safe to publish
+*Phase 1 · Foundation · Traces: SQ-6 (Keith decision, 2026-11-27)*
+Keith supplies the bundled sample photos himself. They are published in the public repository under the repository licence
+(MIT), so before any sample photo is committed its GPS and other personal metadata are stripped, and its source and licence are
+recorded in `tests/fixtures/PROVENANCE.md`. Metadata that is kept is limited to what the trials need (capture date and time,
+camera make and model, exposure settings, orientation, colour profile). **This slot is open until Keith provides the photos**;
+until then trials and tests use synthetic images (`cargo xtask gen-library`) and no personal photo is committed.
+- **Auto** (`integration`): a CI check over the sample folder fails if any file carries GPS tags, owner or serial-number fields,
+  free-text comment or maker-note fields, or an embedded preview that carries metadata, or if a sample has no provenance entry.
+- **Judge** (before the first commit of Keith's photos): Keith confirms he has the right to publish each photo and that no
+  identifiable person who has not agreed appears in it (recommended; the repository is public and MIT-licensed).

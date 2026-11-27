@@ -145,12 +145,14 @@ Other traces (plan, ADR, decision or principle), alongside any inventory rows ab
 | FR-FND-03 | ADR-0002 |
 | FR-FND-08 | Core Principle 3 |
 | FR-FND-13 | Positioning (inventory) |
+| FR-FND-14 | SQ-6 (Keith decision, 2026-11-27) |
 | FR-LIB-10 | ADR-0004 (untrusted input) |
 | FR-BRW-10 | ADR-0004 |
 | FR-ENG-04 | Plan Phase 3 |
 | FR-ENG-09 | ADR-0003 |
 | FR-ENG-11 | ADR-0002 |
 | FR-CRP-06 | ADR-0001 |
+| FR-RAT-01 | SQ-4 (Keith decision, 2026-11-27) |
 | FR-RAT-05 | OQ-2 |
 | FR-RAT-07 | OQ-2 |
 | FR-ALB-01 | ADR-0001 |
