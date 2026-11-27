@@ -11,10 +11,10 @@ const SOFT_LIMIT: usize = 300;
 const HARD_LIMIT: usize = 500;
 
 /// Checks every `.rs` file under the workspace source roots.
-pub fn check() -> Result<()> {
+pub fn check(workspace_root: &Path) -> Result<()> {
     let mut over_hard = Vec::new();
     for root in ["crates", "xtask", "tests"] {
-        visit(Path::new(root), &mut over_hard)?;
+        visit(&workspace_root.join(root), &mut over_hard)?;
     }
     if over_hard.is_empty() {
         println!("file sizes OK (soft limit {SOFT_LIMIT}, hard limit {HARD_LIMIT} lines)");

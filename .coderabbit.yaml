@@ -29,7 +29,7 @@ reviews:
     - path: "crates/**/src/**/*.rs"
       instructions: |
         Library-code standards (ADR-0003). Flag every violation:
-        - No `unwrap()`, `expect()`, `panic!`, `todo!`, `unimplemented!` or indexing that can panic on untrusted input. Return typed errors (`thiserror`) instead.
+        - In production code: no `unwrap()`, `expect()`, `panic!`, `todo!`, `unimplemented!` or indexing that can panic on untrusted input. Return typed errors (`thiserror`) instead. Tests, including inline `#[cfg(test)]` modules, are exempt from the unwrap/expect rules (clippy.toml); the rest of these rules still apply.
         - Every public item has a `///` doc comment saying what it does and, for fallible functions, a `# Errors` section.
         - Files should stay under ~300 lines (hard limit 500). If a file mixes responsibilities, ask for a split into small, focused modules.
         - Comments explain WHY, not what. Non-obvious algorithms, invariants and platform quirks must be commented.

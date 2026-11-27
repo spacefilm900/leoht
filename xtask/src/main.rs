@@ -4,13 +4,16 @@
 //! * `gen-library`  – write a deterministic synthetic photo library (for volume tests).
 //! * `bless`        – regenerate golden-image references after an intended change.
 //! * `check-size`   – enforce the source-file size limits from ADR-0003.
-//! * `ci`           – run the same checks as CI, locally.
+//! * `ci`           – run the same required checks as CI, locally (needs `cargo-deny`).
+//!
+//! Every command works from the workspace root, whatever folder it is invoked from.
 
 // Automation prints progress; the workspace print lints target library crates.
 #![allow(clippy::print_stdout, clippy::print_stderr)]
 
 mod size;
 
+use std::path::PathBuf;
 use std::process::Command;
 
 use anyhow::{Context, Result, bail};
@@ -46,8 +49,17 @@ enum Task {
     Bless,
     /// Fail if any Rust file exceeds the hard size limit; warn above the soft limit.
     CheckSize,
-    /// fmt --check, clippy, tests and size check: what CI runs.
+    /// fmt, clippy, tests, docs, cargo-deny and size check: the required CI checks.
     Ci,
+}
+
+/// The workspace root. `cargo xtask` runs from the caller's folder (the alias does not
+/// `cd`), so repo-relative work must anchor here: xtask lives one level below the root.
+fn workspace_root() -> PathBuf {
+    let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    manifest_dir
+        .parent()
+        .map_or(manifest_dir.clone(), PathBuf::from)
 }
 
 fn main() -> Result<()> {
@@ -75,7 +87,7 @@ fn main() -> Result<()> {
             &["test", "-p", "leoht-it", "--test", "golden"],
             &[("LEOHT_BLESS", "1")],
         ),
-        Task::CheckSize => size::check(),
+        Task::CheckSize => size::check(&workspace_root()),
         Task::Ci => {
             run("cargo", &["fmt", "--all", "--check"], &[])?;
             run(
@@ -91,8 +103,30 @@ fn main() -> Result<()> {
                 ],
                 &[],
             )?;
-            run("cargo", &["test", "--workspace"], &[])?;
-            size::check()
+            // Same flags as the CI `test` job (`--no-fail-fast` shows every failure at once).
+            run(
+                "cargo",
+                &["test", "--workspace", "--all-features", "--no-fail-fast"],
+                &[],
+            )?;
+            // Same as the CI `docs` job: broken intra-doc links fail the build.
+            run(
+                "cargo",
+                &["doc", "--workspace", "--no-deps", "--all-features"],
+                &[("RUSTDOCFLAGS", "-D warnings")],
+            )?;
+            // Same as the CI `cargo-deny` job (licences, advisories, bans, sources).
+            if !Command::new("cargo")
+                .args(["deny", "--version"])
+                .output()
+                .is_ok_and(|o| o.status.success())
+            {
+                bail!(
+                    "cargo-deny is required by CI: install it with `cargo install cargo-deny --locked`"
+                );
+            }
+            run("cargo", &["deny", "--all-features", "check"], &[])?;
+            size::check(&workspace_root())
         }
     }
 }
@@ -101,6 +135,7 @@ fn main() -> Result<()> {
 fn run(program: &str, args: &[&str], env: &[(&str, &str)]) -> Result<()> {
     println!("$ {program} {}", args.join(" "));
     let status = Command::new(program)
+        .current_dir(workspace_root())
         .args(args)
         .envs(env.iter().copied())
         .status()

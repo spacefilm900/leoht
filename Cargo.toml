@@ -28,23 +28,23 @@ leoht-testkit = { path = "crates/leoht-testkit" }
 anyhow = "1.0"                      # application-level errors (cli, xtask only)
 blake3 = "1.8"                      # fast content hashing (identity across renames)
 camino = { version = "1.2", features = ["serde1"] } # UTF-8 paths: no lossy conversions
-clap = { version = "4.6", features = ["derive"] }
+clap = { version = "4.6", features = ["derive"] } # argument parsing for the leoht CLI and xtask
 ignore = "0.4"                      # directory walking + .leohtignore support
-image = { version = "0.25", default-features = false, features = ["jpeg", "png"] }
+image = { version = "0.25", default-features = false, features = ["jpeg", "png"] } # JPEG/PNG decode + encode for thumbnails; other codecs stay off
 kamadak-exif = "0.6"                # pure-Rust EXIF reader (lib name: `exif`)
 notify = "9.0"                      # fs watching (behind leoht-scan's `watch` feature)
 rusqlite = { version = "0.43", features = ["bundled"] } # embedded SQLite, sync
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] } # (de)serialisation of RelPath, recipes and sidecars
+serde_json = "1.0"                  # the `.leoht.json` sidecar format (ADR-0002)
 thiserror = "2.0"                   # typed errors in library crates
-tracing = "0.1"
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tracing = "0.1"                    # structured logging in library crates (no printing)
+tracing-subscriber = { version = "0.3", features = ["env-filter"] } # log output for the CLI binary only
 
 # --- dev / test ---
-criterion = { version = "0.8", default-features = false, features = ["cargo_bench_support"] }
-insta = { version = "1.49", features = ["json"] }
-proptest = "1.12"
-tempfile = "3.27"
+criterion = { version = "0.8", default-features = false, features = ["cargo_bench_support"] } # benchmarks (scan/catalog baselines)
+insta = { version = "1.49", features = ["json"] }  # snapshot tests (sidecar layout)
+proptest = "1.12"                   # property tests (any valid recipe round-trips)
+tempfile = "3.27"                   # throw-away folders for tests
 
 # Deliberately NOT here yet (Phase 1+ decisions): rayon, libheif-rs, rawloader / libraw,
 # wgpu, egui/eframe, tract. See docs/adr and STATUS.md "Open questions".
