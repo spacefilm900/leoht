@@ -16,7 +16,7 @@ Leoht is inspired by the *idea* of Google Picasa (simple folder-based photo mana
    approved creating the public repository `spacefilm900/leoht` while clearance is still pending. That approval is **not**
    trademark clearance and the name may still change. Until the clearance gate (G0a) is closed, do not announce or promote
    the name, publish binaries or packages, or register domains or accounts under it.
-   _(Wording of this exception is for Keith to confirm: changes to this file are legal-policy changes.)_
+   _Wording confirmed by Keith, 2026-11-27._
 
 ## Review
 CodeRabbit is configured to flag suspected copying (`.coderabbit.yaml`). Changes to this file require Keith's approval.

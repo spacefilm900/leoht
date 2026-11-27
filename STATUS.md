@@ -22,6 +22,8 @@ _Last updated: 2026-11-27 by Leoht Master. Update this file in every PR that mov
 |------|-------|
 | Trademark clearance for "Leoht" (USPTO, EUIPO, domains, common-law) | **Open** — repo was made public anyway at Keith's direction; the name may still change |
 | Create public repo `spacefilm900/leoht`, enable CodeRabbit, set branch protection | Repo created (public) with Keith's approval while clearance is pending; CodeRabbit active; **branch protection not yet set** (recommend requiring `CI OK`) |
+| `CLEAN_ROOM.md` rule 6 wording (recorded public-repo exception) | **Confirmed by Keith 2026-11-27** |
+| Plan principle 2 and Phase 3 aligned with ADR-0002 (sidecar canonical, DB index only) | **Done**, approved by Keith 2026-11-27 |
 | Approve ADR-0001 … ADR-0005 | Open |
 | Focused-core quality bar (Core Principle 6): define measurable bars for organise, view, crop and adjust before widening scope | Open (define during Phase 1–3 planning) |
 | Choose and set up a CLA (and CLA bot); until then outside PRs are not merged (ADR-0005) | Open |
@@ -38,7 +40,7 @@ _Last updated: 2026-11-27 by Leoht Master. Update this file in every PR that mov
 * GitHub retired the `macos-14` runner on 2026-11-02; CI uses `macos-15`. Revisit when `macos-15` is deprecated.
 
 ## Risks
-* Triage CodeRabbit's 28 first-review comments on PR #1.
+* CodeRabbit's 28 first-review comments on PR #1 are triaged and fixed (Keith approved 2026-11-27). CodeRabbit skipped re-review of the later pushes, so run a manual review request if needed.
 * HEIC pure-Rust crates are weeks old (maintenance/correctness risk).
 * Name may fail trademark clearance → rename cost grows once the repo is public.
 

@@ -11,7 +11,7 @@
 ## Core Principles (from Picasa lessons)
 
 1. **Filesystem is the source of truth** — Folders on disk are the primary organization. The app indexes them; it does not own or relocate originals unless explicitly asked.
-2. **Non-destructive edits by default** — Edits stored as instructions (sidecar JSON or in a lightweight database). Originals remain untouched. Export or explicit "Save" applies changes.
+2. **Non-destructive edits by default** — Edits stored as instructions (sidecar JSON (canonical), indexed in a lightweight database). Originals remain untouched. Export or explicit "Save" applies changes.
 3. **Simple, fast, local-first** — No mandatory cloud. Optional later features.
 4. **Modernized facilities** — Better RAW support, modern face/object recognition (on-device), improved performance, accessibility, dark mode, etc.
 5. **High-quality, maintainable code** — Small, focused files; highly readable Rust that follows community standards; clear comments and documentation; rigorous testing including performance and large-volume scenarios.
@@ -70,7 +70,7 @@ Priority order and support level for the initial scanner + thumbnail + index. Ra
 ### Phase 3: Non-Destructive Edit Engine
 - Define edit recipe format (crop, rotate, straighten, exposure, contrast, saturation, red-eye, etc.).
 - Apply on-the-fly for preview.
-- Persist in sidecar or DB.
+- Persist in the sidecar (canonical); the database is an index only.
 - Export path that bakes edits.
 - Golden-image tests; performance tests on batches of edits.
 
@@ -186,3 +186,4 @@ The whole resolved tree (178 packages, including transitive ones) passes `cargo 
 - 2026-11-26: Public repository `spacefilm900/leoht` created with Keith's approval while "Leoht" is still a working title; full trademark clearance (USPTO, EUIPO, domains, common-law) is still pending and the name/repo may change.
 - 2026-11-27: Appendix A (Dependencies and licences) added, with a verification legend; see ADR-0005 (licensing and commercial readiness). Keith's plan text above is otherwise unchanged.
 - 2026-11-27: Core Principle 6 added (Excellence at a focused core first), at Keith's request. Keith's other plan text is unchanged.
+- 2026-11-27: Principle 2 and Phase 3 aligned with ADR-0002 (sidecar canonical, database is an index only), approved by Keith 2026-11-27.
