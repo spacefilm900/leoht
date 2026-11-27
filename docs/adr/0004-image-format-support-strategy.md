@@ -44,7 +44,7 @@ be settled before binaries are distributed. Keith prefers a **pure-Rust HEIC dec
 * **Patent note.** HEVC (the codec inside HEIC) is covered by patents. A pure-Rust implementation avoids C dependencies and
   copyleft code but **does not grant patent rights**; both candidate crates say so in their own documentation. libheif
   links libde265 (decoding) and x265 (encoding) which carry their own licences. **Obtain legal review before distributing
-  binaries that decode HEIC**, particularly outside personal use. Phase 1 development builds are not a distribution.
+  binaries that decode HEIC**, particularly outside personal use. The gate applies to **distribution, not to the build stage**: any binary that leaves the project (to testers, as a published CI artifact, a release) must pass the legal review first, even a development build. Builds that only Keith or our agents run locally or in CI without publishing are not distribution, but patent exposure can also arise from making or using, so keep HEIC decoding behind its feature and off by default until the review is done.
 * **RAW: Phase 1 does detection, basic EXIF and embedded-preview thumbnails only.** The obvious Rust RAW crates
   (`rawloader`, `rawler`) are **LGPL-2.1** — in conflict with the MIT/`cargo-deny` policy (Rust links statically) — so adopting
   one requires a licence decision first (or a separate-process boundary, or a permissive alternative).

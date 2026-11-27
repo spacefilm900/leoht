@@ -24,7 +24,8 @@ pull in, and which patent and trademark constraints apply to a *commercial* bina
 ## Considered options
 1. MIT only, no further measures.
 2. MIT + owned code (CLA) + permissive-only dependencies + a patent-aware HEIC path. **(chosen as the proposal)**
-3. Switch to a copyleft or source-available licence now (rejected for now: contradicts the plan's open-source goal and is hard to reverse).
+3. Switch to a copyleft licence (GPL/AGPL) now. Copyleft is a legitimate open-source choice, so this is **not** rejected for being closed. It is rejected *for now* for commercial flexibility: a permissive licence plus owned code keeps a paid edition, a store-distributed build and relicensing open (copyleft terms sit awkwardly with store terms and with proprietary add-ons unless Keith holds every contributor's rights), and the change is hard to reverse once outside contributors exist.
+4. Switch to a source-available licence (e.g. BSL) now. Rejected: it is **not** open source, which contradicts the plan's open-source goal and the contributor appeal we want.
 
 ## Decision
 
