@@ -3,8 +3,8 @@
 _Last updated: 2026-11-26 by Leoht Master. Update this file in every PR that moves a gate._
 
 ## Now
-**Phase 0 — scaffold.** A local, unpushed scaffold passes `cargo fmt --check`, `cargo clippy --workspace --all-targets -- -D warnings`
-and `cargo test --workspace`. Nothing has been pushed; no GitHub repository exists yet.
+**Phase 0 — scaffold.** The public repo `spacefilm900/leoht` exists and PR #1 carries the scaffold. CI is green on macOS (`macos-15`, Apple Silicon), Linux and
+(non-blocking) Windows; CodeRabbit has reviewed. Awaiting Keith's review and ADR approval; PR #1 is not merged.
 
 ## Phases
 | Phase | Scope (from LEOHT_PLAN.md) | State |
@@ -20,8 +20,8 @@ and `cargo test --workspace`. Nothing has been pushed; no GitHub repository exis
 ## Human gates (Keith)
 | Gate | State |
 |------|-------|
-| Trademark clearance for "Leoht" (USPTO, EUIPO, domains, common-law) before the public repo is created/named | **Open** |
-| Create public repo `spacefilm900/leoht` and enable CodeRabbit + branch protection | **Blocked on the gate above** |
+| Trademark clearance for "Leoht" (USPTO, EUIPO, domains, common-law) | **Open** — repo was made public anyway at Keith's direction; the name may still change |
+| Create public repo `spacefilm900/leoht`, enable CodeRabbit, set branch protection | Repo created (public) with Keith's approval while clearance is pending; CodeRabbit active; **branch protection not yet set** (recommend requiring `CI OK`) |
 | Approve ADR-0001 … ADR-0004 | Open |
 | Legal review of HEVC patent exposure before distributing binaries that decode HEIC | Open (needed before any release, not before dev) |
 
@@ -30,8 +30,10 @@ and `cargo test --workspace`. Nothing has been pushed; no GitHub repository exis
 * RAW approach given LGPL-2.1 Rust RAW crates (ADR-0004).
 * Where albums are persisted (decide in Phase 4; ADR-0001).
 * Windows CI becomes required in Phase 6.
+* GitHub retired the `macos-14` runner on 2026-11-02; CI uses `macos-15`. Revisit when `macos-15` is deprecated.
 
 ## Risks
+* Triage CodeRabbit's 28 first-review comments on PR #1.
 * HEIC pure-Rust crates are weeks old (maintenance/correctness risk).
 * Name may fail trademark clearance → rename cost grows once the repo is public.
 
