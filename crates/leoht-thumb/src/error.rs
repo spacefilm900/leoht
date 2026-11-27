@@ -22,6 +22,13 @@ pub enum ThumbError {
         /// Underlying error.
         source: image::ImageError,
     },
+    /// The destination is the source photo itself (same path, link or hard link);
+    /// writing would overwrite the original, which Leoht never does.
+    #[error("refusing to write thumbnail over the source photo {path}")]
+    DestIsSource {
+        /// The destination path.
+        path: Utf8PathBuf,
+    },
     /// The cache directory could not be created.
     #[error("cannot create cache directory {path}: {source}")]
     CacheDir {

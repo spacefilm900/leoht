@@ -1,6 +1,7 @@
 //! Writes the synthetic library to disk.
 
-use std::fs;
+use std::fs::{self, OpenOptions};
+use std::io::Write as _;
 
 use camino::{Utf8Path, Utf8PathBuf};
 use image::{ImageEncoder, RgbImage, codecs::jpeg::JpegEncoder, codecs::png::PngEncoder};
@@ -67,7 +68,8 @@ const SIZE: u32 = 16;
 /// scanner only needs to *detect* those, and Phase 0 has no decoder for them).
 ///
 /// # Errors
-/// Filesystem or encoding failure, or `photos_per_folder == 0`.
+/// Filesystem or encoding failure, `photos_per_folder == 0`, or a target file that already
+/// exists (existing files are never overwritten: generate into a fresh folder).
 pub fn generate_library(
     root: &Utf8Path,
     spec: &LibrarySpec,
@@ -93,12 +95,20 @@ pub fn generate_library(
             source,
         })?;
         let file = dir.join(format!("IMG_{index:06}.{ext}"));
-        fs::write(&file, bytes).map_err(|source| TestkitError::Io { path: file, source })?;
+        // `create_new` refuses to overwrite: generating into a folder that already holds
+        // a file with this name must never destroy it (it could be someone's real photo).
+        write_new(&file, &bytes).map_err(|source| TestkitError::Io { path: file, source })?;
     }
     Ok(GeneratedLibrary {
         photos: spec.count,
         folders: spec.count.div_ceil(spec.photos_per_folder),
     })
+}
+
+/// Writes `bytes` to a file that must not exist yet (atomic check, no race).
+fn write_new(path: &Utf8Path, bytes: &[u8]) -> std::io::Result<()> {
+    let mut file = OpenOptions::new().write(true).create_new(true).open(path)?;
+    file.write_all(bytes)
 }
 
 /// A smooth gradient between seeded endpoints: cheap and deterministic
@@ -217,5 +227,23 @@ mod tests {
             generate_library(&root, &spec),
             Err(TestkitError::EmptyFolders)
         ));
+    }
+
+    #[test]
+    fn existing_files_are_never_overwritten() {
+        let dir = tempfile::tempdir().unwrap();
+        let root = Utf8PathBuf::from_path_buf(dir.path().to_path_buf()).unwrap();
+        let spec = LibrarySpec {
+            count: 1,
+            seed: 1,
+            photos_per_folder: 100,
+        };
+        // Pre-create the exact file the generator would write first.
+        let victim = root.join("year-2000/folder-00000").join("IMG_000000.jpg");
+        fs::create_dir_all(victim.parent().unwrap()).unwrap();
+        fs::write(&victim, b"someone's real photo").unwrap();
+        let err = generate_library(&root, &spec).unwrap_err();
+        assert!(matches!(err, TestkitError::Io { .. }), "got {err:?}");
+        assert_eq!(fs::read(&victim).unwrap(), b"someone's real photo");
     }
 }
