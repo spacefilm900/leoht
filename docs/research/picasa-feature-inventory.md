@@ -1,11 +1,32 @@
 # Picasa feature inventory (clean-room, public sources)
 
-* Status: Draft for review (research input to the functional specification)
+* Status: Draft for review (research input to the functional specification); revised 2026-11-27 with Leoht additions and positioning
 * Date: 2026-11-27
 * Author: Leoht research agent, for Keith Haviland (owner)
 * Scope: Google Picasa **desktop** application, final 3.x versions (3.9 line, last builds October 2015; support ended
   2016-03-15 [S15, S16])
 * Companion: [`sources.md`](sources.md) (every `[S..]` reference below is numbered there, with archive dates)
+
+## Positioning (Leoht original)
+
+*Our own framing; no external sources needed.*
+
+Leoht's primary purpose is a **public case study**: can a high-quality desktop app whose requirements are partly
+subjective ("feels like a Mac app", "colour looks right", "fast") be built agentically, in the open? This differs from
+spec-driven showcase projects such as the multi-agent C compiler and functional AWK interpreter efforts cited in
+`LEOHT_PLAN.md`, where a precise specification and a large conformance suite exist from day one. A photo app has no
+such oracle, so the project has to create its own.
+
+Differentiators we intend to demonstrate and measure:
+
+1. **Mac-native excellence** (Mac first; colour, Retina, HDR, platform conventions).
+2. **HEIC and RAW done properly** (format matrix in ADR-0004; licensing in ADR-0005).
+3. **Testable acceptance criteria derived from fuzzy requirements** (golden images, performance budgets, UI tests, labelled fixture sets).
+4. **Recorded human judgement gates** where a person must decide (feel, best-shot quality, HDR on real displays).
+5. **Measured quality**, published with each phase's "How we built X" narrative.
+
+This is the lens for the recommendations below: Picasa's behaviours are the baseline for *what users expect*, and the
+sections "Leoht additions (committed)" and "Future possibilities" record where we intend to go further.
 
 ## Clean-room statement
 
@@ -25,6 +46,7 @@ Each feature has a neutral description, source references, and a Leoht recommend
 | **Modernise** | Build the idea, but change how (safer, more modern, or to fit a Leoht principle). |
 | **Defer** | Worth having, but not before the phase shown; revisit then. |
 | **Drop** | Do not build (obsolete, cloud-bound, or out of scope). Phase shown as `-`. |
+| **Add** | Leoht original, not a Picasa feature: commit to building it (section "Leoht additions (committed)"). |
 
 The *Phase* column uses the numbering in `LEOHT_PLAN.md`: 0 foundation, 1 folder scanner and index, 2 viewer and grid UI,
 3 non-destructive edit engine, 4 organisation features, 5 Mac polish and packaging, 6+ cross-platform and advanced
@@ -34,21 +56,23 @@ slideshow) we say so and propose one; those are suggestions for you to approve, 
 ## Summary
 
 
-| Area | Keep | Modernise | Defer | Drop | Total |
-|---|---:|---:|---:|---:|---:|
-| 1. Library and folder management | 7 | 6 | 4 | 0 | 17 |
-| 2. Organisation: albums, stars, captions, tags, timeline, search | 6 | 7 | 1 | 1 | 15 |
-| 3. Viewing: grid, lightbox, slideshow | 4 | 2 | 0 | 2 | 8 |
-| 4. Editing | 12 | 7 | 4 | 1 | 24 |
-| 5. People and faces | 2 | 2 | 0 | 2 | 6 |
-| 6. Places and geotagging | 1 | 2 | 0 | 1 | 4 |
-| 7. Import | 2 | 2 | 1 | 1 | 6 |
-| 8. Export and output | 2 | 2 | 2 | 4 | 10 |
-| 9. Metadata, duplicates, hidden items and misc | 3 | 3 | 1 | 0 | 7 |
-| **Total** | **39** | **33** | **13** | **12** | **97** |
+| Area | Keep | Modernise | Defer | Drop | Add | Total |
+|---|---:|---:|---:|---:|---:|---:|
+| 1. Library and folder management | 7 | 6 | 4 | 0 | 0 | 17 |
+| 2. Organisation: albums, stars, captions, tags, timeline, search | 6 | 7 | 1 | 1 | 0 | 15 |
+| 3. Viewing: grid, lightbox, slideshow | 4 | 2 | 0 | 2 | 0 | 8 |
+| 4. Editing | 12 | 7 | 4 | 1 | 0 | 24 |
+| 5. People and faces | 2 | 2 | 0 | 2 | 0 | 6 |
+| 6. Places and geotagging | 1 | 2 | 0 | 1 | 0 | 4 |
+| 7. Import | 2 | 2 | 1 | 1 | 0 | 6 |
+| 8. Export and output | 2 | 2 | 2 | 4 | 0 | 10 |
+| 9. Metadata, duplicates, hidden items and misc | 3 | 3 | 1 | 0 | 0 | 7 |
+| **Subtotal: Picasa-derived features** | **39** | **33** | **13** | **12** | **0** | **97** |
+| Leoht additions (committed) | 0 | 0 | 0 | 0 | 5 | 5 |
+| **Total committed rows** | **39** | **33** | **13** | **12** | **5** | **102** |
+| *Future possibilities (not committed; separate list)* | | | | | | *14* |
 
-Counts are of the rows in section 1 to 9 below (a row sometimes groups several closely related Picasa functions, such as
-a pack of effects). They are a planning aid, not a feature-point estimate.
+Counts are of the rows in sections 1 to 9 below, plus the five committed Leoht additions (`Add`: our own ideas, not Picasa's). A row sometimes groups several closely related Picasa functions, such as a pack of effects. Future possibilities are listed separately and are not counted as commitments. They are a planning aid, not a feature-point estimate.
 
 ### Most notable recommendations
 
@@ -60,7 +84,8 @@ a pack of effects). They are a planning aid, not a feature-point estimate.
 6. **Phase 5 is the natural home** for slideshow, email via the share sheet, quick standalone viewer and file associations.
 7. **Picasa interoperability is a live question.** At least four active open-source projects read and write Picasa's per-folder metadata so old libraries keep working [S44-S48]. Doing the same would need a legal and clean-room decision first (OQ-1).
 8. **Avoid Google's names.** Do not reuse "I'm Feeling Lucky" or effect names that echo third-party camera brands; use our own labels (EDIT-06, EDIT-15).
-9. **Our closest peers now exist.** Two Rust projects (Dalica, Picco) state a near-identical Picasa-faithful, local-first, sidecar-plus-cache goal; see the [Picasa-inspired projects](#picasa-inspired-projects) section for positioning.
+9. **Leoht goes beyond Picasa in five committed places** (geometry suite, culling mode, copy/paste edits, similar-photo stacks, wide-colour and HDR display; ADD-01 to ADD-05), and records 14 further ideas as future possibilities (FUT-01 to FUT-14). Accessibility, performance and the originals guarantee may be promoted to requirements in the functional spec.
+10. **Our closest peers now exist.** Two Rust projects (Dalica, Picco) state a near-identical Picasa-faithful, local-first, sidecar-plus-cache goal; see the [Picasa-inspired projects](#picasa-inspired-projects) section for positioning.
 
 
 ## 1. Library and folder management
@@ -230,6 +255,47 @@ supports the rationale.
 | MOD-13 | Scriptable core | Agentic development and testing need a stable CLI. | CLI first (plan Phase 1), then a stable command surface the UI calls. | 1 |
 | MOD-14 | Related-file groups | RAW+JPEG pairs and motion photos are common (Lap treats them as one item [S52], excerpt only). | Model "stacks" in the data model before Phase 4. | 4 |
 | MOD-15 | Unicode and long paths | International folder names and cross-platform paths. | UTF-8 path types (already a workspace rule). | 1 |
+
+
+## Leoht additions (committed)
+
+**Leoht original: these are our own ideas, not Picasa's, and need no external sources.** Recommendation `Add` means
+"commit to building it" (the equivalent of Keep for something Picasa did not have). Each has a rationale tag, a target
+phase from `LEOHT_PLAN.md`, and a testability note, because the project's case-study goal depends on being able to verify
+quality (see Positioning). Rationale tags: **Excellence** (makes the app clearly better) and **First ten minutes** (a user
+notices it almost immediately).
+
+| ID | Addition | Description | Rationale | Leoht | Phase | How we would verify it |
+|---|---|---|---|---|---|---|
+| ADD-01 | Geometry suite | One coherent set of geometry tools: straighten, horizontal perspective, vertical perspective and free crop; one-tap standard ratios (1:1, 4:3, 3:2, 16:9, 5:4, common print sizes, custom, and a lock to the original ratio); and auto-straighten that detects the horizon or strong vertical lines, only *suggests* a correction, and is fully undoable. | Excellence, and noticed in the first ten minutes: crop and straighten are the first edits anyone tries, so feel and correctness decide first impressions. Picasa had crop and straighten (EDIT-01, EDIT-02) but no perspective correction. | **Add** | 3 | Golden-image tests on synthetic grids and chart images with a tolerance; property tests for ratio arithmetic (rounding, lock, rotate-then-crop invariants); a labelled test set of tilted horizons and converging verticals with an accuracy target for auto-straighten; undo/redo round-trip test; UI test that a ratio tap changes the crop box as specified; recipe ops versioned under ADR-0002. |
+| ADD-02 | Culling mode | A full-screen mode for sorting a shoot quickly: arrow keys to move, single-key star or reject, and optional auto-advance after a decision. Decisions are saved as sidecar data, never by touching or moving files. | Excellence: it turns the grid into a working tool for the most repetitive job in photography. Picasa had stars and a viewer (ORG-06, VIEW-02) but no dedicated pass-through workflow. | **Add** | 2 (full-screen viewer and keys), 4 (stars, reject flag, saved decisions) | UI tests with egui_kittest driving key sequences and asserting resulting ratings; a latency budget for next-image display (preload ahead; measured on the CI Macs); atomic-write test for sidecar updates; kill-and-restart test that decisions survive; manual Mac checklist for feel. |
+| ADD-03 | Copy and paste edits across a selection | Copy the edit recipe from one photo and paste it (all of it, or chosen parts) onto many selected photos, with one undo for the whole paste. | Excellence, and it falls out of the design: because each edit is a portable recipe in a sidecar (ADR-0001, ADR-0002), pasting is just copying data. Picasa's batch edit (EDIT-24) was narrower. | **Add** | 3 | Property test: pasting a recipe onto N photos yields identical recipes (apart from per-photo ops such as crop that the user excludes); golden-image test for the rendered result; performance budget for a paste onto 1,000 photos; undo test; partial-paste semantics specified and tested. |
+| ADD-04 | Burst and similar-photo stacks with best-shot pick | Group bursts and near-identical shots into a stack, show one cover, and suggest a best shot (for example by sharpness and exposure); the user can override. Files stay where they are; the stack is a view stored in sidecar or index data. | Excellence: modern cameras and phones produce many near-duplicates, and sorting them is where users spend time. Extends the stack idea (MOD-14) and optional duplicate detection (META-02). | **Add** | 4 (grouping on capture time and similarity), 6 (best-shot scoring) | Labelled fixture libraries of bursts and similar shots with precision/recall targets for grouping; deterministic scoring tests on fixtures for sharpness and exposure; override persistence test; volume test that grouping a 100k synthetic library meets a time budget; a human-judgement gate for the best-shot heuristic, since 'best' is subjective. |
+| ADD-05 | Correct wide-colour and HDR display | Photos display with correct colour on wide-gamut (Display P3) screens and Retina scaling, and HDR images and HDR-capable displays are handled properly, so edits look the same in the app as in an export. | Excellence, and noticed in the first ten minutes on a Mac: washed-out or oversaturated colour or soft Retina rendering makes an app feel wrong immediately. Picasa's colour management was an off-by-default option (LIB-17). | **Add** | 2 (colour-management baseline: ICC-aware, P3, Retina), 5 (HDR/XDR display on Mac) | Colour pipeline tests with known colour charts and ICC profiles against reference values; golden-image tolerances stated in a colour space; snapshot tests at 1x and 2x scale. CI cannot verify a real XDR display, so Phase 5 HDR needs a manual checklist on real Mac hardware and is recorded as a human gate. |
+
+## Future possibilities (not yet committed)
+
+**Leoht original: ideas we have recorded so they are not lost. None is a commitment.** Each has a candidate phase and the
+reason it is deferred. Three of them (accessibility FUT-11, performance FUT-05, originals guarantee FUT-12) may be promoted
+to requirements in the functional specification; the rest stay optional until a phase gate says otherwise.
+
+| ID | Idea | One-line description | Candidate phase | Why deferred |
+|---|---|---|---|---|
+| FUT-01 | Hold-to-compare and split before/after | Hold a key to see the original, or drag a divider across the photo to compare before and after. | 3 | Needs the edit engine; the simple side-by-side compare (VIEW-05) covers the basic need first. |
+| FUT-02 | Named edit history, snapshots and virtual copies | Name points in an edit history, snapshot them, and keep several versions of one photo without duplicating the file. | 3 to 4 | Needs a settled recipe format first; versions change the sidecar schema (ADR-0002). |
+| FUT-03 | Explainable auto-enhance | Auto-enhance shows exactly which slider values it chose, so users can learn from and adjust it. | 3 | Depends on auto-enhance existing (EDIT-05, EDIT-06); cheap if recipes are the output, so a candidate to fold in. |
+| FUT-04 | Highlight and shadow recovery from HEIC, RAW and HDR headroom | Use the extra range in HEIC, RAW and HDR files to recover bright and dark areas properly. | 3 to 6 | Needs the decode and colour work (ADD-05, RAW decoder licence choice in ADR-0005) before it is meaningful. |
+| FUT-05 | Instant grid at 100k photos, 60 fps, with CI budgets | Smooth scrolling over very large libraries with performance budgets enforced in CI. | 1 to 2, 6+ | Partly covered already by the plan's volume tests and MOD-12; may be promoted to a requirement in the functional spec. |
+| FUT-06 | Background indexing with no import wait | Open a folder and start browsing immediately while scanning and thumbnails continue in the background. | 1 to 2 | Follows from the Phase 1 scanner design; deferred only because the first scanner is a CLI. |
+| FUT-07 | Live Photo and RAW+JPEG pairing | Treat a RAW with its JPEG, or a still with its motion clip, as one item. | 4 | Needs the stacks model (ADD-04, MOD-14); Live Photo video handling is outside the current plan. |
+| FUT-08 | On-device content and colour search | Find photos by what is in them or by colour, using local models only. | 6+ | Needs the on-device AI work (MOD-07) and a model-licence review. |
+| FUT-09 | Safe in-app move and rename that carries sidecars | Moving or renaming a photo or folder in the app moves its sidecar too and keeps albums intact. | 4 | Related to LIB-07 and MOD-08; needs the sidecar re-association design (source_hash) built first. |
+| FUT-10 | Quick Look, Finder integration, share sheet and drag to Mail or Messages | Native Mac integration so Leoht photos behave like system photos. | 5 | Mac-polish phase; extends VIEW-06 and OUT-03. |
+| FUT-11 | Accessibility | VoiceOver labels, keyboard-only operation, system dark and light, contrast, text scaling and reduced motion. | 2, 5 | Depends on the UI toolkit's accessibility support (MOD-04). Likely to be promoted to a requirement in the functional spec. |
+| FUT-12 | Originals guarantee | A published, tested guarantee that Leoht never modifies, moves or deletes original files unless asked, with the test that proves it. | 1 onward | Already enforced by the end-to-end test in ADR-0002. Likely to be promoted to a requirement in the functional spec. |
+| FUT-13 | Export-all-edits | One command exports every edit and metadata to open formats (XMP and flattened images) so users are never locked in. | 4 to 6 | Needs XMP export (META-01, MOD-11) first. |
+| FUT-14 | Orphaned-sidecar health check | A scan that finds sidecars whose photo was renamed or removed outside the app and offers to re-attach or clean them. | 3 to 4 | Already noted as a Phase 3 task in ADR-0002; waits for the sidecar writer. |
+
 
 ## Lessons from comparable apps
 
