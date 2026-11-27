@@ -94,7 +94,7 @@ fn photo_from_entry(root: &Utf8Path, entry: &ignore::DirEntry) -> Result<Option<
         .map_err(|e| tracing::warn!(%path, error = %e, "cannot stat"))?;
     let rel = path.strip_prefix(root).map_err(|_| ())?;
     let rel =
-        RelPath::new(rel.as_str()).map_err(|e| tracing::warn!(%path, error = %e, "bad path"))?;
+        RelPath::from_native(rel).map_err(|e| tracing::warn!(%path, error = %e, "bad path"))?;
     let modified_unix_secs = meta.modified().ok().map_or(0, unix_secs);
     Ok(Some(Photo {
         path: rel,
