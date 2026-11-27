@@ -7,6 +7,9 @@
 //! Environment:
 //! * `LEOHT_VOLUME_LIBRARY` – ABSOLUTE path of an already generated library (from
 //!   `cargo xtask gen-library`); cargo runs tests from the package folder, so relative paths break.
+//! * `LEOHT_VOLUME_EXPECTED_COUNT` – REQUIRED with `LEOHT_VOLUME_LIBRARY`: how many photos that
+//!   library was generated with (the `--count` given to `gen-library`). It is deliberately not
+//!   derived from a scan: a scanner bug that misses files would otherwise agree with itself.
 //! * `LEOHT_VOLUME_COUNT`   – otherwise generate this many photos (default 1000).
 
 #![allow(clippy::print_stderr)] // timings are the output of these tests
@@ -26,8 +29,11 @@ use leoht_testkit::{LibrarySpec, generate_library};
 fn scan_hash_and_index_a_large_library() {
     let temp;
     let (root, expected) = if let Ok(dir) = std::env::var("LEOHT_VOLUME_LIBRARY") {
-        let report = scan_library(&Utf8PathBuf::from(&dir)).expect("scan pre-generated library");
-        (Utf8PathBuf::from(dir), report.photos.len())
+        let expected = std::env::var("LEOHT_VOLUME_EXPECTED_COUNT")
+            .expect("LEOHT_VOLUME_EXPECTED_COUNT must accompany LEOHT_VOLUME_LIBRARY")
+            .parse::<usize>()
+            .expect("LEOHT_VOLUME_EXPECTED_COUNT must be a number");
+        (Utf8PathBuf::from(dir), expected)
     } else {
         let count = std::env::var("LEOHT_VOLUME_COUNT")
             .ok()
@@ -44,6 +50,11 @@ fn scan_hash_and_index_a_large_library() {
         .expect("generate");
         (temp.root.clone(), count)
     };
+
+    assert!(
+        expected > 0,
+        "an empty workload would make every assertion vacuous"
+    );
 
     let t = Instant::now();
     let mut report = scan_library(&root).expect("scan");

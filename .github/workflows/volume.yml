@@ -51,3 +51,5 @@ jobs:
           cargo test -p leoht-it --test volume --release -- --ignored --nocapture
         env:
           LEOHT_VOLUME_LIBRARY: ${{ github.workspace }}/target/volume-library
+          # Independent of the scanner: the count we asked the generator for.
+          LEOHT_VOLUME_EXPECTED_COUNT: ${{ env.VOLUME_COUNT }}
