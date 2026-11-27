@@ -128,7 +128,7 @@ mod tests {
     #[test]
     fn sidecar_path_keeps_the_full_file_name() {
         let p = sidecar_path_for(Utf8Path::new("lib/2020/IMG_1.jpg"));
-        // Compare components, not the string: Windows joins with `\\`, Unix with `/`.
+        // Compare components, not the string: Windows joins with a backslash, Unix with `/`.
         assert_eq!(p.file_name(), Some("IMG_1.jpg.leoht.json"));
         assert_eq!(p.parent(), Some(Utf8Path::new("lib/2020")));
     }

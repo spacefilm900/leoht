@@ -29,9 +29,11 @@ mod tests {
     fn layout_is_size_then_fanout_then_hash() {
         let hash = ContentHash::from_hex(&format!("ab{}", "0".repeat(62))).unwrap();
         let p = cache_path(Utf8Path::new("/cache"), &hash, 256);
-        assert_eq!(
-            p.as_str(),
-            format!("/cache/256/ab/ab{}.jpg", "0".repeat(62))
-        );
+        // Build the expected path with `join`, not a string: Windows uses `\` separators.
+        let expected = Utf8PathBuf::from("/cache")
+            .join("256")
+            .join("ab")
+            .join(format!("ab{}.jpg", "0".repeat(62)));
+        assert_eq!(p, expected);
     }
 }
