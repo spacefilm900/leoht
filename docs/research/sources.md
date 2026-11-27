@@ -8,7 +8,7 @@ asset in producing these documents. Only *public descriptions of behaviour* were
 Google blog posts, Wikipedia, and third-party reviews and tutorials. Where a source is a third-party open-source
 project, only its published README/description was read for *behaviour and positioning*; no source code was read or
 copied. No Google icons, screenshots or trademarks are reproduced. Quotes are limited to a few words.
-See [`CLEAN_ROOM.md`](https://github.com/spacefilm900/leoht/blob/phase0/scaffold/CLEAN_ROOM.md) (on the `phase0/scaffold` branch, PR #1).
+See [`CLEAN_ROOM.md`](../../CLEAN_ROOM.md).
 
 **Dates.** *Archive date* is the UTC date of the Wayback Machine capture actually read, followed by the full capture
 timestamp `YYYYMMDDhhmmss` in backticks; open it at `https://web.archive.org/web/<timestamp>/<URL>`. *Accessed* is when we read it. All accessed dates are 2026-11-27
@@ -111,7 +111,7 @@ nothing here was installed or run.
 
 | ID | Source | Supported |
 |---|---|---|
-| S67 | `LEOHT_PLAN.md` (phases 0-6+, principles) and `docs/adr/0001`-`0005` on branch `phase0/scaffold` (PR #1) | Phase numbers used for recommendations; sidecar and data-model decisions that the inventory is consistent with. |
+| S67 | `LEOHT_PLAN.md` (phases 0-6+, principles) and `docs/adr/0001`-`0005` on `main` | Phase numbers used for recommendations; sidecar and data-model decisions that the inventory is consistent with. |
 
 ## Unsourced or uncertain statements (verify before relying on them)
 

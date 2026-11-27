@@ -34,6 +34,8 @@ This stack draws from successful open projects (Picco, PIC, RapidRAW, etc.) whil
 
 Each phase is a self-contained increment. Agents can work in parallel on isolated components with clear specs, tests, and integration points. Document every decision, prompt pattern, failure, and lesson. All changes go through GitHub PRs with CodeRabbit review and passing CI.
 
+Each feature group first ships as a rough **early trial** that Keith tries hands-on on his Apple Silicon Mac before it is polished, and his trial sign-off is an explicit gate step. **Every trial must be very easy to run**: a single download or command, no Rust toolchain or build steps, sample photos bundled or a one-step folder pick, a short "what to try / what to tell us" checklist, originals never modified, and an easy way to give feedback. See `docs/process/phase-gates.md` (gate Gt).
+
 ### Phase 0: Foundation & Documentation (this document + repo scaffold)
 - Create GitHub repository structure.
 - Define data model (photos, folders, albums as virtual collections, edit recipes).
@@ -187,3 +189,4 @@ The whole resolved tree (178 packages, including transitive ones) passes `cargo 
 - 2026-11-27: Appendix A (Dependencies and licences) added, with a verification legend; see ADR-0005 (licensing and commercial readiness). Keith's plan text above is otherwise unchanged.
 - 2026-11-27: Core Principle 6 added (Excellence at a focused core first), at Keith's request. Keith's other plan text is unchanged.
 - 2026-11-27: Principle 2 and Phase 3 aligned with ADR-0002 (sidecar canonical, database is an index only), approved by Keith 2026-11-27.
+- 2026-11-27: Early feature trials added to the phased plan (one sentence under "Phased Development Plan") with an explicit ease-of-trial requirement, at Keith's request; details in `docs/process/phase-gates.md` (gate Gt). Keith's other plan text is unchanged.

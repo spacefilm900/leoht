@@ -25,6 +25,11 @@ Differentiators we intend to demonstrate and measure:
 4. **Recorded human judgement gates** where a person must decide (feel, best-shot quality, HDR on real displays).
 5. **Measured quality**, published with each phase's "How we built X" narrative.
 
+**Features are complex to visualise from a description.** So the first trial of each feature group (an early, rough build that
+Keith tries hands-on before polish; see `docs/process/phase-gates.md`, gate Gt) is what validates the recommendations below.
+Every trial must be very easy to run: a single download or command, no build tools, sample photos ready, a short
+checklist, originals never modified, and easy feedback. Until a group has had its trial, treat its rows as hypotheses.
+
 This is the lens for the recommendations below: Picasa's behaviours are the baseline for *what users expect*, and the
 sections "Leoht additions (committed)" and "Future possibilities" record where we intend to go further.
 
@@ -48,7 +53,7 @@ Each feature has a neutral description, source references, and a Leoht recommend
 | **Drop** | Do not build (obsolete, cloud-bound, or out of scope). Phase shown as `-`. |
 | **Add** | Leoht original, not a Picasa feature: commit to building it (section "Leoht additions (committed)"). |
 
-The *Phase* column uses the numbering in `LEOHT_PLAN.md` (on branch `phase0/scaffold`, PR #1; the plan and ADR-0001 to ADR-0005 are not part of this branch): 0 foundation, 1 folder scanner and index, 2 viewer and grid UI,
+The *Phase* column uses the numbering in `LEOHT_PLAN.md` (on `main`, as are ADR-0001 to ADR-0005): 0 foundation, 1 folder scanner and index, 2 viewer and grid UI,
 3 non-destructive edit engine, 4 organisation features, 5 Mac polish and packaging, 6+ cross-platform and advanced
 features (faces, geotag map, batch operations, large libraries). Where the plan has no home for a feature (import,
 slideshow) we say so and propose one; those are suggestions for you to approve, not decisions.
@@ -378,6 +383,6 @@ gThumb) [S64].
 This inventory is intended as the input to a functional specification. Suggested path: (1) you review the Keep/Modernise/
 Defer/Drop calls and open questions; (2) we turn the accepted rows into numbered requirements per phase, each with an
 acceptance test; (3) each requirement keeps its row ID (for example `EDIT-07`) so traceability from research to test is
-unbroken. Re-verify the live-site sources (sections C and D of `sources.md`) when the specification is written, because
+unbroken; (4) each feature group gets an early trial (gate Gt) that validates its requirements before polish. Re-verify the live-site sources (sections C and D of `sources.md`) when the specification is written, because
 repositories and vendor pages change.
 
