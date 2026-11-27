@@ -3,8 +3,8 @@
 _Last updated: 2026-11-27 by Leoht Master. Update this file in every PR that moves a gate._
 
 ## Now
-**Phase 0 — scaffold.** The public repo `spacefilm900/leoht` exists and PR #1 carries the scaffold. CI is green on macOS (`macos-15`, Apple Silicon), Linux and
-(non-blocking) Windows; CodeRabbit has reviewed. Awaiting Keith's review and ADR approval; PR #1 is not merged.
+**Phase 0 — scaffold.** The public repo `spacefilm900/leoht` exists and the scaffold PR #1 is merged to `main` (2026-11-27). CI is green on macOS (`macos-15`, Apple Silicon), Linux and
+(non-blocking) Windows; CodeRabbit has reviewed. PR #2 adds the clean-room Picasa feature inventory (`docs/research/`) and the early-feature-trial gate (Gt). Awaiting Keith's ADR approval.
 
 ## Phases
 | Phase | Scope (from LEOHT_PLAN.md) | State |
@@ -25,6 +25,7 @@ _Last updated: 2026-11-27 by Leoht Master. Update this file in every PR that mov
 | `CLEAN_ROOM.md` rule 6 wording (recorded public-repo exception) | **Confirmed by Keith 2026-11-27** |
 | Plan principle 2 and Phase 3 aligned with ADR-0002 (sidecar canonical, DB index only) | **Done**, approved by Keith 2026-11-27 |
 | Approve ADR-0001 … ADR-0005 | Open |
+| Early feature trials (Gt): each feature group ships as a rough trial Keith tries on his Apple Silicon Mac before polish; every trial must be very easy to run (`docs/process/phase-gates.md`) | **Adopted 2026-11-27** at Keith's request; first trial to be scheduled with the first feature group |
 | Focused-core quality bar (Core Principle 6): define measurable bars for organise, view, crop and adjust before widening scope | Open (define during Phase 1–3 planning) |
 | Choose and set up a CLA (and CLA bot); until then outside PRs are not merged (ADR-0005) | Open |
 | IP-lawyer review before any commercial release: HEVC patents, RAW licences, trademark, CLA wording, paid-edition structure (ADR-0005) | Open (not needed for development) |
