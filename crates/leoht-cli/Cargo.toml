@@ -1,0 +1,27 @@
+[package]
+name = "leoht-cli"
+description = "Command-line driver for Leoht (the Phase 1 demo front-end)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "leoht"
+path = "src/main.rs"
+
+[dependencies]
+leoht-core.workspace = true
+leoht-catalog.workspace = true
+leoht-scan.workspace = true
+anyhow.workspace = true
+camino.workspace = true
+clap.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+[lints]
+workspace = true

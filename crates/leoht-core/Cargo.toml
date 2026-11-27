@@ -1,0 +1,24 @@
+[package]
+name = "leoht-core"
+description = "Leoht domain model: photos, folders, albums, edit recipes. UI- and I/O-agnostic."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+# Deliberately tiny dependency list: this crate must stay usable from any
+# front-end (egui now; Tauri or SwiftUI-over-FFI later) with no I/O, no async
+# runtime and no UI toolkit.
+[dependencies]
+camino.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true
+
+[lints]
+workspace = true
