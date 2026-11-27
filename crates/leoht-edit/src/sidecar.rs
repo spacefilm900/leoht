@@ -1,7 +1,9 @@
 //! The per-image `.leoht.json` sidecar.
 
 use std::collections::BTreeMap;
-use std::fs;
+use std::fs::{self, File, OpenOptions};
+use std::io::Write as _;
+use std::sync::atomic::{AtomicU64, Ordering};
 
 use camino::{Utf8Path, Utf8PathBuf};
 use leoht_core::{ContentHash, EditRecipe};
@@ -92,11 +94,17 @@ impl Sidecar {
         Ok(Some(sidecar))
     }
 
-    /// Writes the sidecar atomically: temp file in the same folder, then rename.
-    /// A crash mid-write therefore never leaves a half-written sidecar.
+    /// Writes the sidecar atomically and durably (ADR-0002).
+    ///
+    /// The JSON goes to a fresh, uniquely named temp file in the same folder
+    /// (created with `create_new`, so it can never truncate or follow a link onto
+    /// an existing file such as an original photo), is flushed to storage with
+    /// `sync_all`, renamed over the sidecar, and then the folder is synced so the
+    /// rename itself survives a power cut. A crash or failure therefore leaves
+    /// either the old sidecar or the new one, never a half-written file.
     ///
     /// # Errors
-    /// Invalid recipe, or I/O failure.
+    /// Invalid recipe, or I/O failure (including a failed sync, which is not ignored).
     pub fn write(&self, path: &Utf8Path) -> Result<(), EditError> {
         self.recipe
             .validate()
@@ -110,14 +118,65 @@ impl Sidecar {
         })?;
         json.push('\n');
 
-        let tmp = path.with_extension("json.tmp");
         let io_err = |p: &Utf8Path| {
             let p = p.to_owned();
             move |source| EditError::Io { path: p, source }
         };
-        fs::write(&tmp, json).map_err(io_err(&tmp))?;
-        fs::rename(&tmp, path).map_err(io_err(path))
+        let (tmp, mut file) = create_temp_beside(path).map_err(io_err(path))?;
+        let published = file
+            .write_all(json.as_bytes())
+            .and_then(|()| file.sync_all()) // contents on disk *before* they replace the old sidecar
+            .and_then(|()| {
+                drop(file);
+                fs::rename(&tmp, path)
+            });
+        if let Err(source) = published {
+            // `tmp` is the file *we* just created exclusively, so removing it is safe.
+            let _ = fs::remove_file(&tmp);
+            return Err(EditError::Io {
+                path: path.to_owned(),
+                source,
+            });
+        }
+        sync_parent_dir(path).map_err(io_err(path))
     }
+}
+
+/// Distinguishes temp files created by concurrent writers in one process.
+static TEMP_COUNTER: AtomicU64 = AtomicU64::new(0);
+
+/// Creates `<path>.<pid>.<n>.tmp` next to `path` with exclusive creation.
+/// A name collision (stale file from a crashed run) is skipped, never overwritten.
+fn create_temp_beside(path: &Utf8Path) -> std::io::Result<(Utf8PathBuf, File)> {
+    let name = path.file_name().unwrap_or("sidecar");
+    let mut last_err = None;
+    for _ in 0..16 {
+        let n = TEMP_COUNTER.fetch_add(1, Ordering::Relaxed);
+        let tmp = path.with_file_name(format!("{name}.{}.{n}.tmp", std::process::id()));
+        match OpenOptions::new().write(true).create_new(true).open(&tmp) {
+            Ok(file) => return Ok((tmp, file)),
+            Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => last_err = Some(e),
+            Err(e) => return Err(e),
+        }
+    }
+    Err(last_err.unwrap_or_else(|| std::io::Error::other("no free temp file name")))
+}
+
+/// Flushes the folder entry so a completed rename is durable. Unix only:
+/// Windows cannot open a directory for syncing, and NTFS journals the rename.
+#[cfg(unix)]
+fn sync_parent_dir(path: &Utf8Path) -> std::io::Result<()> {
+    let dir = match path.parent() {
+        Some(p) if !p.as_str().is_empty() => p,
+        _ => Utf8Path::new("."),
+    };
+    File::open(dir)?.sync_all()
+}
+
+#[cfg(not(unix))]
+#[allow(clippy::unnecessary_wraps)] // keeps the signature identical to the Unix version
+fn sync_parent_dir(_path: &Utf8Path) -> std::io::Result<()> {
+    Ok(())
 }
 
 #[cfg(test)]
@@ -202,5 +261,43 @@ mod tests {
             Sidecar::read(&path),
             Err(EditError::InvalidRecipe { .. })
         ));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn write_never_touches_a_file_that_a_temp_name_could_alias() {
+        // A symlink at the old fixed temp name must not redirect the write onto the photo.
+        let dir = tempfile::tempdir().unwrap();
+        let root = utf8_tmp(&dir);
+        let photo = root.join("a.jpg");
+        std::fs::write(&photo, b"ORIGINAL PHOTO BYTES").unwrap();
+        std::os::unix::fs::symlink(&photo, root.join("a.jpg.leoht.json.tmp")).unwrap();
+        Sidecar::new(EditRecipe::default())
+            .write(&root.join("a.jpg.leoht.json"))
+            .unwrap();
+        assert_eq!(std::fs::read(&photo).unwrap(), b"ORIGINAL PHOTO BYTES");
+    }
+
+    #[test]
+    fn concurrent_writers_each_publish_complete_json() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = utf8_tmp(&dir).join("a.jpg.leoht.json");
+        std::thread::scope(|s| {
+            for turns in 1..=3_u8 {
+                let path = &path;
+                s.spawn(move || {
+                    let sc = Sidecar::new(EditRecipe {
+                        ops: vec![EditOp::Rotate {
+                            quarter_turns: turns,
+                        }],
+                    });
+                    for _ in 0..25 {
+                        sc.write(path).unwrap();
+                    }
+                });
+            }
+        });
+        assert!(Sidecar::read(&path).unwrap().is_some());
+        assert_eq!(std::fs::read_dir(dir.path()).unwrap().count(), 1);
     }
 }

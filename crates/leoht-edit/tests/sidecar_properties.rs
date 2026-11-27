@@ -5,6 +5,11 @@ use camino::Utf8PathBuf;
 use leoht_core::{EditOp, EditRecipe, RedEyeRegion};
 use leoht_edit::Sidecar;
 use proptest::prelude::*;
+use proptest::test_runner::{Config, RngSeed};
+
+/// Fixed seed: every run explores the same cases, so a failure always reproduces.
+/// Change it on purpose (and say so in the PR) to explore new cases.
+const PROPTEST_SEED: u64 = 0x1E07_5EED;
 
 /// Strategy producing only *valid* operations (inside the documented ranges).
 fn arb_op() -> impl Strategy<Value = EditOp> {
@@ -34,6 +39,8 @@ fn arb_op() -> impl Strategy<Value = EditOp> {
 }
 
 proptest! {
+    #![proptest_config(Config { rng_seed: RngSeed::Fixed(PROPTEST_SEED), ..Config::default() })]
+
     #[test]
     fn any_valid_recipe_round_trips(ops in prop::collection::vec(arb_op(), 0..8)) {
         let dir = tempfile::tempdir().unwrap();

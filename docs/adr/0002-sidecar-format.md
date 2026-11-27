@@ -33,11 +33,17 @@ before Phase 3 builds the edit engine, because the format becomes a public, long
   the catalog is rebuilt. Deleting the database never loses an edit.
 * **Versioned schema.** Every file has an integer `schema_version` (currently 1). A reader refuses a *newer* version
   with a clear error (never overwrites it), preserves unknown top-level fields on write, and treats
-  additive optional fields as non-breaking. Breaking changes bump the version and add a migrate-on-read step.
+  additive optional *top-level* fields as non-breaking. Adding a field **inside** `recipe.ops` (or any nested object) is
+  *not* non-breaking: this version cannot preserve unknown nested fields, so such an addition must bump
+  `schema_version`, and an older reader then refuses the file instead of silently dropping data. Breaking changes bump the version and add a migrate-on-read step.
   Contents v1: `schema_version`, optional `source_hash` (BLAKE3 of the original, for re-association after a rename),
   and `recipe.ops` (see ADR-0001).
-* **Safe writes.** Write to a temp file in the same folder, then rename over the target; validate the recipe before
-  writing and after reading. The original image bytes are never touched (asserted by the end-to-end test).
+* **Safe and durable writes.** Validate the recipe before writing and after reading. Create a *uniquely named* temp
+  file in the same folder with exclusive creation (`create_new`; never reuse a fixed name, never overwrite or follow a
+  link onto an existing file, which also keeps concurrent writers apart). Write it, `sync_all` the file, rename it over
+  the target, then sync the parent directory so the rename survives a power cut (Unix; Windows cannot open a directory
+  for syncing, and NTFS journals the rename). Sync failures are errors, not ignored. Remove only the temp file we
+  created if a step fails. The original image bytes are never touched (asserted by the end-to-end test).
 * **XMP is an export/interop path, not the primary store.** An `xmp` export (and later import of basic
   XMP fields such as rating and keywords) will be provided for other tools, but XMP cannot express Leoht's recipe
   faithfully, is XML-heavy, and would tie our evolution to someone else's schema.
