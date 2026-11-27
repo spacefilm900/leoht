@@ -28,7 +28,7 @@ The user can exclude folders or whole drives (backups, system folders). Excluded
 Support follows the format matrix in ADR-0004: JPEG and PNG full; HEIC/HEIF first-class through a swappable decoder; RAW (common makers) detected with metadata and embedded preview, full decode later (FR-ENG-10); other types (TIFF, WebP and so on) detected only, shown as a placeholder until supported. The support level of each format is machine-readable and tested.
 - **Auto** (`unit`, `integration`): `PhotoFormat::support()` is pinned by a test; a corpus of small, licensed sample files per format is decoded or detected as the matrix says.
 - **Gate:** any shipped binary that decodes HEIC needs the G-legal review first (ADR-0004). **Trial builds (Gt) exclude HEIC decoding and ship JPEG and PNG samples only** (Keith, 2026-11-27, SQ-1; revisit after the review).
-- **Auto** (`integration`): the trial artifact is built without the HEIC feature and contains no HEIC sample files (checked by a CI step on the trial build).
+- **Auto** (`integration`): the trial artifact is built with *every* HEIC decoding feature off (the pure-Rust decoder, the optional `libheif-rs` fallback and any system-decoder feature, as named in ADR-0004 and ADR-0005, including ones added later) and contains no HEIC sample files. A CI step on the trial build fails if any cargo feature that enables HEIC decoding is on, using a list of such features kept next to the check.
 
 ### FR-LIB-05 Choose which file types to show
 *Phase 1 · Foundation · Traces: LIB-13*

@@ -38,7 +38,7 @@ Leoht reads rating and keywords from existing XMP sidecars and exports its own r
 
 ### FR-RAT-07 Optional write-back into the file (opt-in)
 *Phase 6 · Widening · Traces: META-01, GEO-02, OQ-2*
-An explicit, warned action writes selected metadata into the original file's own metadata, never by default, with a confirmation that names the files and a backup. Under the recommended default for OQ-2 this ships after the focused core.
+An explicit, warned action writes selected metadata into the original file's own metadata, never by default, with a confirmation that names the files and a backup. Under the recommended default for OQ-2 this ships after the focused core, and it is not part of the Gt-RAT trial: it gets its own trial after Gf.
 - **Auto** (`integration`): without the action no original changes; with it, only the chosen fields change and a backup exists; the file stays valid.
 
 ### FR-RAT-08 Selection basket

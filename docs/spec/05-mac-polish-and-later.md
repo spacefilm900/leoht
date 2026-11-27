@@ -121,7 +121,7 @@ Suggest the best photo of a stack from measurable qualities (sharpness, exposure
 *Phase 6 · Foundation · Traces: MOD-12, FUT-05*
 The 100k column of FR-FND-07 is met on the CI Mac in the scheduled volume job, and the grid stays at 60 fps in Keith's judgement on a real 100k-photo library.
 - **Auto** (`volume`, `perf`): scheduled job on a deterministic 100k synthetic library.
-- **Judge** (Gt-LAT-scale): Keith scrolls his own large library and answers fast, OK or slow. The trial build also records frame times during the session (a log the checklist asks him to send), so the 60 fps target is measured as well as judged.
+- **Judge** (Gt-LAT-scale): Keith scrolls his own large library and answers fast, OK or slow. The trial build also records frame times during the session (a log the checklist asks him to send). **Pass rule:** both the measurement and the judgement must pass: p95 frame time of at most 16.7 ms (60 fps) over the scrolling session, and Keith's answer is fast or OK. If the log fails but Keith answers fast, the trial still fails on the measurement and a performance issue is opened; if the log passes but he answers slow, the feel issue is opened and the trial does not pass.
 
 ### FR-LAT-14 Linux and Windows builds
 *Phase 6 · Foundation · Traces: META-07, Plan Phase 6*

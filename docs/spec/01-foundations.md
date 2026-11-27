@@ -13,13 +13,15 @@ Leoht never changes, moves, renames or deletes an original photo file unless the
 the UI or CLI. Scanning, thumbnailing, viewing, editing, rating, albums and search only write sidecars, the catalog,
 thumbnail caches and library-level Leoht files, all outside the original files' bytes.
 - **Auto** (`integration`): an end-to-end test hashes every original file (bytes and modification time) of a fixture library
-  before and after each operation in a matrix. Originals must be identical; only sidecars (new or updated) and Leoht
-  library files may change. The matrix covers the operations that exist at that phase and grows with each phase (Phase 1:
+  before and after each operation in a matrix. Originals must be identical; the only other changes allowed are
+  sidecars (new or updated), Leoht library files, and the new files the user explicitly asked for (a saved copy or an export,
+  written beside the original or in the chosen folder, never replacing one). The matrix covers the operations that exist at that phase and grows with each phase (Phase 1:
   scan, thumbnails, rebuild; Phase 2: open and view; Phase 3: edit, save sidecar, save a copy, export; Phase 4: rate, album, search).
   Runs on every PR.
-- **Auto** (`integration`): with the *original files* set read-only, every operation still leaves them identical. On a fully
-  read-only library (for example a read-only volume), scan, view and search work with the catalog and caches stored
-  elsewhere, and actions that must write a sidecar fail with a clear message instead of writing anywhere hidden.
+- **Auto** (`integration`): with the *original files* set read-only, every operation in the matrix for that phase still leaves
+  them identical. On a fully read-only library (for example a read-only volume), the read-only operations that exist at that phase
+  (Phase 1: scan, thumbnails; Phase 2: view; Phase 4: search) work with the catalog and caches stored elsewhere, and actions
+  that must write a sidecar fail with a clear message instead of writing anywhere hidden (from Phase 3).
 - **Every trial** (T5): the trial runs the before/after hash check on the bundled samples and prints the result.
 
 ### FR-FND-02 The index is disposable

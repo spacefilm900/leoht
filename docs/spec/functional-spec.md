@@ -91,7 +91,7 @@ feedback, a first result within 5 minutes, easy removal, feature-flagged where a
 | FR-ENG | Edit engine, save and export | Gt-CRP (ships with crop; FR-ENG-10 excluded until after Gf) | 3 | 11 | 7 | 3 | 1 | [03-editing.md](03-editing.md) |
 | FR-CRP | Crop and geometry | Gt-CRP | 3 | 8 | 7 | 1 | 0 | [03-editing.md](03-editing.md) |
 | FR-ADJ | Adjust | Gt-ADJ | 3 | 8 | 8 | 0 | 0 | [03-editing.md](03-editing.md) |
-| FR-RAT | Rate, cull, caption and tag | Gt-RAT | 4, 6 | 8 | 5 | 2 | 1 | [04-organisation.md](04-organisation.md) |
+| FR-RAT | Rate, cull, caption and tag | Gt-RAT (FR-RAT-07 excluded until after Gf) | 4, 6 | 8 | 5 | 2 | 1 | [04-organisation.md](04-organisation.md) |
 | FR-ALB | Albums, timeline and search | Gt-ALB | 4 | 7 | 6 | 1 | 0 | [04-organisation.md](04-organisation.md) |
 | FR-FIL | Files, folders, duplicates and stacks | Gt-FIL | 4 | 8 | 6 | 2 | 0 | [04-organisation.md](04-organisation.md) |
 | FR-MAC | Mac polish and sharing | Gt-MAC | 5 | 8 | 3 | 2 | 3 | [05-mac-polish-and-later.md](05-mac-polish-and-later.md) |
@@ -141,7 +141,7 @@ an unsigned build needs the one-line Gatekeeper step in the checklist (T4).
 
 ### Trial sequence and the focused core
 
-Core Principle 6 sets the order: Gt-BRW, Gt-CRP (engine, crop and geometry; FR-ENG-10 RAW editing is excluded because it is Widening), Gt-ADJ, Gt-RAT, Gt-ALB, Gt-FIL, then gate Gf
+Core Principle 6 sets the order: Gt-BRW, Gt-CRP (engine, crop and geometry; FR-ENG-10 RAW editing is excluded because it is Widening), Gt-ADJ, Gt-RAT (FR-RAT-07, the write-back into files, is excluded because it is Widening and waits for Gf and OQ-2), Gt-ALB, Gt-FIL, then gate Gf
 (quality bar) before any Widening item, then Gt-MAC (which holds the Mac polish plus three Widening items, FR-MAC-06 to -08, that wait for Gf).
 
 ## 5. Requirement files
