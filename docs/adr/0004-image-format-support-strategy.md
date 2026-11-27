@@ -79,7 +79,7 @@ an active release cadence, with **`heic-rs`** as the smaller, decoder-only alter
 3. **Legal**: HEVC patent exposure for distributing a macOS app that decodes HEIC (Keith to arrange review before any binary release).
 4. **RAW**: which crate/approach, given LGPL-2.1 for `rawloader`/`rawler`? Candidate permissive approach to evaluate: read the
    embedded JPEG preview from TIFF-based RAWs via EXIF structures (`kamadak-exif`); CR3/RAF containers need separate handling.
-5. **macOS-native decoding** (ImageIO) as an optional Mac-only path in Phase 5: worth it for speed and patent handling by the OS?
+5. **macOS-native decoding** (ImageIO) as an optional Mac-only path: ADR-0005 recommends it as the commercial Mac route (behind a `heic-system` feature); include it in the Phase 1 spike for speed and correctness. Whether it resolves patent exposure for a paid app is a question for the lawyer.
 
 ## Consequences
 * Good: clear, testable scope for Phase 1; the default build stays pure Rust and permissively licensed.
@@ -87,3 +87,4 @@ an active release cadence, with **`heic-rs`** as the smaller, decoder-only alter
 * Bad: HEIC support depends on very young crates; schedule risk if the spike finds gaps.
 * Bad: RAW will initially show embedded previews only, which some users will find limited.
 * Follow-up: add `deny.toml` exceptions only by explicit ADR; add HEIC/RAW provenance rows for any fixtures.
+* See also [ADR-0005](0005-licensing-and-commercial-readiness.md): the commercial HEIC path (Apple system frameworks behind a feature, pure-Rust decoder elsewhere), the HEVC patent pools, and the RAW licence gate (including LibRaw's LGPL-2.1-or-CDDL-1.0 dual licence). Licence register: Appendix A of `LEOHT_PLAN.md`.

@@ -22,12 +22,16 @@ _Last updated: 2026-11-26 by Leoht Master. Update this file in every PR that mov
 |------|-------|
 | Trademark clearance for "Leoht" (USPTO, EUIPO, domains, common-law) | **Open** — repo was made public anyway at Keith's direction; the name may still change |
 | Create public repo `spacefilm900/leoht`, enable CodeRabbit, set branch protection | Repo created (public) with Keith's approval while clearance is pending; CodeRabbit active; **branch protection not yet set** (recommend requiring `CI OK`) |
-| Approve ADR-0001 … ADR-0004 | Open |
+| Approve ADR-0001 … ADR-0005 | Open |
+| Choose and set up a CLA (and CLA bot); until then outside PRs are not merged (ADR-0005) | Open |
+| IP-lawyer review before any commercial release: HEVC patents, RAW licences, trademark, CLA wording, paid-edition structure (ADR-0005) | Open (not needed for development) |
 | Legal review of HEVC patent exposure before distributing binaries that decode HEIC | Open (needed before any release, not before dev) |
 
 ## Open questions
 * HEIC decoder: `heifer` vs `heic-rs` (Phase 1 spike; ADR-0004).
-* RAW approach given LGPL-2.1 Rust RAW crates (ADR-0004).
+* RAW approach given LGPL-2.1 Rust RAW crates and LibRaw's LGPL-2.1-or-CDDL-1.0 licence (ADR-0004, ADR-0005).
+* Commercial HEIC path: Apple system frameworks behind a `heic-system` feature vs the pure-Rust decoder (ADR-0005; include in the Phase 1 spike).
+* Dependency licence register: Appendix A of `LEOHT_PLAN.md` (update on every dependency change).
 * Where albums are persisted (decide in Phase 4; ADR-0001).
 * Windows CI becomes required in Phase 6.
 * GitHub retired the `macos-14` runner on 2026-11-02; CI uses `macos-15`. Revisit when `macos-15` is deprecated.

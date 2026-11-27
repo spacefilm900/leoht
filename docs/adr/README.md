@@ -9,6 +9,7 @@ Spec first, code second: a decision that shapes more than one crate gets an ADR 
 | [0002](0002-sidecar-format.md) | Sidecar format: `.leoht.json` | Proposed |
 | [0003](0003-code-quality-standards.md) | Code-quality standards | Proposed |
 | [0004](0004-image-format-support-strategy.md) | Image format support strategy (Phase 1) | Proposed |
+| [0005](0005-licensing-and-commercial-readiness.md) | Licensing and commercial readiness | Proposed |
 
 Statuses: **Proposed** → **Accepted** (Keith approves via PR; see `docs/process/phase-gates.md`)
 → optionally **Superseded by ADR-NNNN**. Never edit an Accepted ADR's decision; write a new one that supersedes it.

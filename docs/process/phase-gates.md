@@ -16,9 +16,10 @@ issues labelled `human-gate`. Chat messages are not the record; issues and PRs a
 | Gx-privacy Legal/privacy review | Before face recognition or any sharing/export feature (Phase 6+) | Keith |
 | G0a Trademark / name clearance | Before the public repo is created or named | Keith (USPTO, EUIPO, domains, common-law searches; possibly counsel) |
 | G0b Create public repo, enable CodeRabbit, branch protection | After G0a | Keith (Master prepares the exact steps) |
-| G0c ADR approval | Before Phase 1 starts | Keith approves ADR-0001…0004 |
+| G0c ADR approval | Before Phase 1 starts | Keith approves ADR-0001…0005 |
 | G1 Phase 1 entry | After scaffold CI is green on `main` | See "Phase 1 entry criteria" in the proposal |
 | G1x Phase 1 exit | CLI demo + 1k/10k volume baselines recorded | Keith |
+| G-commercial Commercial release readiness | Before any paid build, App Store listing or paid marketing | Trademark cleared; IP-lawyer review (ADR-0005); CLA in place; Appendix A reviewed |
 | G-legal HEIC/HEVC patent review | Before distributing any binary that decodes HEIC | Keith / counsel |
 | Gn Phase N exit | Each phase | Keith reviews narrative, tests and demo |
 
