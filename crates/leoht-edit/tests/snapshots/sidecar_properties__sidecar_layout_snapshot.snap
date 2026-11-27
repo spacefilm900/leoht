@@ -1,0 +1,26 @@
+---
+source: crates/leoht-edit/tests/sidecar_properties.rs
+expression: sidecar
+---
+{
+  "schema_version": 1,
+  "recipe": {
+    "ops": [
+      {
+        "op": "crop",
+        "x": 0.25,
+        "y": 0.25,
+        "width": 0.5,
+        "height": 0.5
+      },
+      {
+        "op": "rotate",
+        "quarter_turns": 1
+      },
+      {
+        "op": "exposure",
+        "stops": 0.5
+      }
+    ]
+  }
+}

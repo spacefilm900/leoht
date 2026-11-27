@@ -1,2 +1,8 @@
 /target
+**/*.rs.bk
 .DS_Store
+# Synthetic libraries produced by `cargo xtask gen-library` (can be GBs).
+/target/volume-library/
+*.snap.new
+.idea/
+.vscode/

@@ -1,0 +1,8 @@
+# Pinned so every contributor, agent and CI runner builds with the same compiler.
+# Bump deliberately (one PR, "chore: bump toolchain") — never implicitly.
+# `rust-version` in Cargo.toml (the MSRV) is lower than this pin on purpose:
+# the pin is "what we develop with", the MSRV is "what we promise to support".
+[toolchain]
+channel = "1.100.0"
+components = ["clippy", "rustfmt"]
+profile = "minimal"
