@@ -190,3 +190,4 @@ The whole resolved tree (178 packages, including transitive ones) passes `cargo 
 - 2026-11-27: Core Principle 6 added (Excellence at a focused core first), at Keith's request. Keith's other plan text is unchanged.
 - 2026-11-27: Principle 2 and Phase 3 aligned with ADR-0002 (sidecar canonical, database is an index only), approved by Keith 2026-11-27.
 - 2026-11-27: Early feature trials added to the phased plan (one sentence under "Phased Development Plan") with an explicit ease-of-trial requirement, at Keith's request; details in `docs/process/phase-gates.md` (gate Gt). Keith's other plan text is unchanged.
+- 2026-11-27: Draft functional specification added at `docs/spec/` (requirements derived from the Picasa inventory; plan text unchanged). Keith decided OQ-1: Picasa metadata import is a read-only importer, Phase 6 or later, gated on a legal review.

@@ -1,6 +1,6 @@
 # Picasa feature inventory (clean-room, public sources)
 
-* Status: Draft for review (research input to the functional specification); revised 2026-11-27 with Leoht additions and positioning
+* Status: Draft for review (research input to the functional specification); revised 2026-11-27 with Leoht additions and positioning; OQ-1 resolved 2026-11-27 (Keith)
 * Date: 2026-11-27
 * Author: Leoht research agent, for Keith Haviland (owner)
 * Scope: Google Picasa **desktop** application, final 3.x versions (3.9 line, last builds October 2015; support ended
@@ -87,7 +87,7 @@ Counts are of the rows in sections 1 to 9 below, plus the five committed Leoht a
 4. **Drop everything cloud, disc or novelty.** Web-album upload and sync, collaborative albums, online contacts, movie maker, gift discs, burned slideshows, the screensaver and the online editor add-on (12 rows marked Drop). Novelty effect packs are deferred, not built early (EDIT-15).
 5. **Import has no home in the plan.** Picasa's import (device detection, date-named folders, skip duplicates, safe card clearing) is where folder structure begins. We suggest pulling a basic import earlier than Phase 6+ (OQ-3).
 6. **Phase 5 is the natural home** for slideshow, email via the share sheet, quick standalone viewer and file associations.
-7. **Picasa interoperability is a live question.** Several active open-source projects work with Picasa's per-folder metadata: PicasaPy documents reading and writing it [S44], photon shares star ratings with Picasa's ini file [S48], and Picasso imports stars, captions and rotation [S46]; Picco describes itself as keeping a Picasa library alive [S45]. We did not verify read and write support for Picco or Dalica [S47]. Doing the same would need a legal and clean-room decision first (OQ-1).
+7. **Picasa interoperability is a live question.** Several active open-source projects work with Picasa's per-folder metadata: PicasaPy documents reading and writing it [S44], photon shares star ratings with Picasa's ini file [S48], and Picasso imports stars, captions and rotation [S46]; Picco describes itself as keeping a Picasa library alive [S45]. We did not verify read and write support for Picco or Dalica [S47]. Keith decided on 2026-11-27 that Leoht will offer a read-only importer in Phase 6 or later, gated on a legal review (OQ-1, resolved).
 8. **Avoid Google's names.** Do not reuse "I'm Feeling Lucky" or effect names that echo third-party camera brands; use our own labels (EDIT-06, EDIT-15).
 9. **Leoht goes beyond Picasa in five committed places** (geometry suite, culling mode, copy/paste edits, similar-photo stacks, wide-colour and HDR display; ADD-01 to ADD-05), and records 14 further ideas as future possibilities (FUT-01 to FUT-14). Accessibility, performance and the originals guarantee may be promoted to requirements in the functional spec.
 10. **Our closest peers now exist.** Two Rust projects (Dalica, Picco) state a near-identical Picasa-faithful, local-first, sidecar-plus-cache goal; see the [Picasa-inspired projects](#picasa-inspired-projects) section for positioning.
@@ -371,7 +371,7 @@ gThumb) [S64].
 
 | ID | Question | Recommendation |
 |---|---|---|
-| OQ-1 | Should Leoht ever read Picasa's per-folder metadata to help migrate old libraries? | Defer to Phase 6+. If yes: read-only, never write Picasa's files, built only from public third-party descriptions after a clean-room and legal review (ADR). Today we deliberately recorded no format details. |
+| OQ-1 | Should Leoht ever read Picasa's per-folder metadata to help migrate old libraries? | **Resolved by Keith, 2026-11-27: yes, as a read-only importer in Phase 6 or later, gated on a legal review** (gate G-import in `docs/process/phase-gates.md`; requirement FR-LAT-01 in `docs/spec/`). Leoht never writes Picasa's files, and the importer is built only from public third-party descriptions after a clean-room and legal review. Today we deliberately recorded no format details. |
 | OQ-2 | Principle 1 versus writing tags, captions and coordinates into originals (META-01, GEO-02). | Sidecar by default; explicit opt-in write-back to XMP; originals untouched otherwise. |
 | OQ-3 | Where does import live? The plan has no import phase. | Add a minimal import (copy into dated folders, skip duplicates by hash, verify before clearing a card) to late Phase 4 or an early Phase 6. |
 | OQ-4 | Slideshow and quick viewer: which phase? | Phase 5 with Mac polish. |
@@ -382,7 +382,7 @@ gThumb) [S64].
 
 This inventory is intended as the input to a functional specification. Suggested path: (1) you review the Keep/Modernise/
 Defer/Drop calls and open questions; (2) we turn the accepted rows into numbered requirements per phase, each with an
-acceptance test; (3) each requirement keeps its row ID (for example `EDIT-07`) so traceability from research to test is
+acceptance test (done as a draft: see `docs/spec/functional-spec.md`); (3) each requirement keeps its row ID (for example `EDIT-07`) so traceability from research to test is
 unbroken; (4) each feature group gets an early trial (gate Gt) that validates its requirements before polish. Re-verify the live-site sources (sections C and D of `sources.md`) when the specification is written, because
 repositories and vendor pages change.
 

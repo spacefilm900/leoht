@@ -4,7 +4,7 @@ _Last updated: 2026-11-27 by Leoht Master. Update this file in every PR that mov
 
 ## Now
 **Phase 0 — scaffold.** The public repo `spacefilm900/leoht` exists and the scaffold PR #1 is merged to `main` (2026-11-27). CI is green on macOS (`macos-15`, Apple Silicon), Linux and
-(non-blocking) Windows; CodeRabbit has reviewed. PR #2 adds the clean-room Picasa feature inventory (`docs/research/`) and the early-feature-trial gate (Gt). Awaiting Keith's ADR approval.
+(non-blocking) Windows; CodeRabbit has reviewed. The clean-room Picasa feature inventory (`docs/research/`) and the early-feature-trial gate (Gt) are merged (PR #2). A draft functional specification is open for Keith's review (`docs/spec/functional-spec.md`).
 
 ## Phases
 | Phase | Scope (from LEOHT_PLAN.md) | State |
@@ -21,10 +21,12 @@ _Last updated: 2026-11-27 by Leoht Master. Update this file in every PR that mov
 | Gate | State |
 |------|-------|
 | Trademark clearance for "Leoht" (USPTO, EUIPO, domains, common-law) | **Open** — repo was made public anyway at Keith's direction; the name may still change |
-| Create public repo `spacefilm900/leoht`, enable CodeRabbit, set branch protection | Repo created (public) with Keith's approval while clearance is pending; CodeRabbit active; **branch protection not yet set** (recommend requiring `CI OK`) |
+| Create public repo `spacefilm900/leoht`, enable CodeRabbit, set branch protection | Repo created (public) with Keith's approval while clearance is pending; CodeRabbit active; branch protection requiring `CI OK` is set |
 | `CLEAN_ROOM.md` rule 6 wording (recorded public-repo exception) | **Confirmed by Keith 2026-11-27** |
 | Plan principle 2 and Phase 3 aligned with ADR-0002 (sidecar canonical, DB index only) | **Done**, approved by Keith 2026-11-27 |
-| Approve ADR-0001 … ADR-0005 | Open |
+| Approve ADR-0001 … ADR-0005 (and `LEOHT_PLAN.md`) | **Approved by Keith 2026-11-27, "for now"** (to be revisited as the spec and trials teach us more) |
+| Draft functional specification (`docs/spec/`) | **Open: Keith to review.** Open questions OQ-2 to OQ-6 and SQ-1 to SQ-6 each carry a recommended default |
+| OQ-1: Picasa metadata import | **Decided by Keith 2026-11-27:** read-only importer, Phase 6 or later, gated on a legal review (gate G-import) |
 | Early feature trials (Gt): each feature group ships as a rough trial Keith tries on his Apple Silicon Mac before polish; every trial must be very easy to run (`docs/process/phase-gates.md`) | **Adopted 2026-11-27** at Keith's request; first trial to be scheduled with the first feature group |
 | Focused-core quality bar (Core Principle 6): define measurable bars for organise, view, crop and adjust before widening scope | Open (define during Phase 1–3 planning) |
 | Choose and set up a CLA (and CLA bot); until then outside PRs are not merged (ADR-0005) | Open |
