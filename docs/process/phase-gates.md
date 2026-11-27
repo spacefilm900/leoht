@@ -21,10 +21,12 @@ issues labelled `human-gate`. Chat messages are not the record; issues and PRs a
 | G1x Phase 1 exit | CLI demo + 1k/10k volume baselines recorded | Keith |
 | G-commercial Commercial release readiness | Before any paid build, App Store listing or paid marketing | Trademark cleared; IP-lawyer review (ADR-0005); CLA in place; Appendix A reviewed |
 | G-legal HEIC/HEVC patent review | Before distributing any binary that decodes HEIC | Keith / counsel |
+| Gf Focused-core quality bar | Before any new feature area or scope widening beyond organise, view, crop and adjust (Core Principle 6) | Keith confirms the focused core meets its quality bar |
 | Gn Phase N exit | Each phase | Keith reviews narrative, tests and demo |
 
 ## Phase exit checklist (every phase)
 - [ ] Working code merged; CI green on macOS and Linux
+- [ ] Core Principle 6: does the focused core (organise, view, crop, adjust) meet its quality bar before this phase widens scope?
 - [ ] Tests at the right levels (unit, integration, golden/perf/volume where the phase calls for them)
 - [ ] ADRs written/updated; `STATUS.md` current
 - [ ] "How we built X" narrative in `narratives/`

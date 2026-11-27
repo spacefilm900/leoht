@@ -15,6 +15,7 @@
 3. **Simple, fast, local-first** — No mandatory cloud. Optional later features.
 4. **Modernized facilities** — Better RAW support, modern face/object recognition (on-device), improved performance, accessibility, dark mode, etc.
 5. **High-quality, maintainable code** — Small, focused files; highly readable Rust that follows community standards; clear comments and documentation; rigorous testing including performance and large-volume scenarios.
+6. **Excellence at a focused core first** — Make organise, view, crop and adjust clearly excellent before widening scope. New features are added only once the core meets its quality bar.
 
 ## Recommended Technology Stack (for agentic velocity + production path)
 
@@ -184,3 +185,4 @@ The whole resolved tree (178 packages, including transitive ones) passes `cargo 
 - 2026-11-26: Phase 1 format matrix added under Phase 1 (Keith's request); see ADR-0004. Replaced the earlier condensed working copy with the full plan text; no other wording changed.
 - 2026-11-26: Public repository `spacefilm900/leoht` created with Keith's approval while "Leoht" is still a working title; full trademark clearance (USPTO, EUIPO, domains, common-law) is still pending and the name/repo may change.
 - 2026-11-27: Appendix A (Dependencies and licences) added, with a verification legend; see ADR-0005 (licensing and commercial readiness). Keith's plan text above is otherwise unchanged.
+- 2026-11-27: Core Principle 6 added (Excellence at a focused core first), at Keith's request. Keith's other plan text is unchanged.
