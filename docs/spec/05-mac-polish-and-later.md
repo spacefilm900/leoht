@@ -69,7 +69,7 @@ Copy photos from a card or camera into dated folders (configurable and previewed
 ### FR-LAT-03 Faces: on-device detection, opt-in
 *Phase 6 · Widening · Traces: FACE-01, LIB-15, MOD-07*
 Face detection and grouping run only on the device, only when the user opts in per library and per folder, with all data deletable and no network use. Needs gate Gx-privacy.
-- **Auto** (`integration`): with the option off, no detection runs and no data exists; delete removes all face data; network-blocked run succeeds (FR-FND-08).
+- **Auto** (`integration`): with the option off, no detection runs and no data exists; delete removes all face data; a full detection run with traffic routed to a recording sink makes no connection attempt (FR-FND-08).
 
 ### FR-LAT-04 Names and people albums
 *Phase 6 · Widening · Traces: FACE-02, FACE-03*
@@ -121,7 +121,7 @@ Suggest the best photo of a stack from measurable qualities (sharpness, exposure
 *Phase 6 · Foundation · Traces: MOD-12, FUT-05*
 The 100k column of FR-FND-07 is met on the CI Mac in the scheduled volume job, and the grid stays at 60 fps in Keith's judgement on a real 100k-photo library.
 - **Auto** (`volume`, `perf`): scheduled job on a deterministic 100k synthetic library.
-- **Judge** (Gt-LAT-scale): Keith scrolls his own large library and answers fast, ok or slow.
+- **Judge** (Gt-LAT-scale): Keith scrolls his own large library and answers fast, OK or slow. The trial build also records frame times during the session (a log the checklist asks him to send), so the 60 fps target is measured as well as judged.
 
 ### FR-LAT-14 Linux and Windows builds
 *Phase 6 · Foundation · Traces: META-07, Plan Phase 6*

@@ -12,10 +12,14 @@ or changes them (SQ-2).
 Leoht never changes, moves, renames or deletes an original photo file unless the user explicitly asks for that action in
 the UI or CLI. Scanning, thumbnailing, viewing, editing, rating, albums and search only write sidecars, the catalog,
 thumbnail caches and library-level Leoht files, all outside the original files' bytes.
-- **Auto** (`integration`): an end-to-end test hashes every file (bytes and modification time) of a fixture library before
-  and after each operation in a matrix (scan, thumbnails, open, edit, save sidecar, rate, album, search, export). Only new
-  `*.leoht.json` files and Leoht library files may differ. Runs on every PR.
-- **Auto** (`integration`): the same operations succeed on a read-only fixture library (catalog and caches live elsewhere).
+- **Auto** (`integration`): an end-to-end test hashes every original file (bytes and modification time) of a fixture library
+  before and after each operation in a matrix. Originals must be identical; only sidecars (new or updated) and Leoht
+  library files may change. The matrix covers the operations that exist at that phase and grows with each phase (Phase 1:
+  scan, thumbnails, rebuild; Phase 2: open and view; Phase 3: edit, save sidecar, save a copy, export; Phase 4: rate, album, search).
+  Runs on every PR.
+- **Auto** (`integration`): with the *original files* set read-only, every operation still leaves them identical. On a fully
+  read-only library (for example a read-only volume), scan, view and search work with the catalog and caches stored
+  elsewhere, and actions that must write a sidecar fail with a clear message instead of writing anywhere hidden.
 - **Every trial** (T5): the trial runs the before/after hash check on the bundled samples and prints the result.
 
 ### FR-FND-02 The index is disposable
@@ -77,15 +81,16 @@ Leoht meets these budgets (p95 unless stated) on the CI Mac, and feels right on 
 Size-independent: app launch to window 2 s; lightbox next image (preloaded) 50 ms, cold open of a 12-megapixel JPEG 300 ms;
 edit preview update while dragging a slider 50 ms; export of one 12-megapixel JPEG 2 s; paste of an edit onto 1,000 photos 10 s.
 - **Auto** (`perf`, `volume`): `criterion` benchmarks and deterministic synthetic libraries (`cargo xtask gen-library`)
-  enforce the 1k and 10k columns in CI from Phase 1. The 100k column runs in a scheduled volume job from Phase 6 (plan and
+  enforce the 1k and 10k columns in CI from Phase 1 (rows for features that do not exist yet, such as live search from Phase 4, join the check when their phase delivers them). The 100k column runs in a scheduled volume job from Phase 6 (plan and
   ADR-0003). A regression of more than 25% against the recorded baseline fails the check.
-- **Judge** (each trial): "does it feel fast?" answered fast, ok or slow; "slow" opens a performance issue even if the budget passes.
+- **Judge** (each trial): "does it feel fast?" answered fast, OK or slow; "slow" opens a performance issue even if the budget passes.
 
 ### FR-FND-08 Private and offline by default
 *Phase 1 · Foundation · Traces: Core Principle 3, MOD-07*
 Leoht makes no network connection and collects no telemetry in any build unless the user turns on a named feature that needs it.
-- **Auto** (`integration`): the core runs a full scenario with the network blocked; `cargo-deny` bans networking and
-  telemetry crates from the default feature set.
+- **Auto** (`integration`): the core runs a full scenario with all network traffic routed to a recording sink, and the test
+  fails on any connection attempt (not merely on success when blocked); `cargo-deny` bans networking and telemetry crates
+  from the default feature set.
 - **Every trial:** the trial notes say that no data leaves the Mac.
 
 ### FR-FND-09 A scriptable core

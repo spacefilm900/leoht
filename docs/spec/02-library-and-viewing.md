@@ -57,8 +57,8 @@ Opening a library never blocks on a full scan: results appear as they are found,
 
 ### FR-LIB-10 Damaged and hostile files never crash the scan
 *Phase 1 · Foundation · Traces: ADR-0004 (untrusted input)*
-Truncated, corrupt, zero-byte, enormous or malformed files are skipped or shown as damaged with a reason; the scan finishes and lists errors.
-- **Auto** (`integration`, `property`): a fuzz corpus (using `cargo-fuzz`) and fixture set of broken files; the scan always terminates with no panic; memory stays bounded.
+Truncated, corrupt, zero-byte, enormous or malformed files are recorded in the catalog as damaged entries with the reason (never silently skipped), so the viewer can show them (FR-BRW-10); the scan finishes and lists the errors.
+- **Auto** (`integration`, `property`): a fuzz corpus (using `cargo-fuzz`) and fixture set of broken files; the scan always terminates with no panic; memory stays bounded; every broken fixture appears as a damaged catalog entry with a reason.
 
 ## Browse and view (FR-BRW), Phase 2
 
@@ -72,7 +72,7 @@ A folder list mirrors the real folders (tree or flat), sortable by name, date or
 *Phase 2 · Core · Traces: VIEW-01, MOD-12*
 A virtualised grid shows thumbnails with a size slider, optional file name and caption under each, and stays smooth at any library size.
 - **Auto** (`perf`, `volume`, `ui`): frame and jump budgets from FR-FND-07 on 1k and 10k; only visible items are loaded (counted); snapshot tests at 1x and 2x scale.
-- **Judge** (Gt-BRW): scroll fast through the sample library; answer fast, ok or slow, and whether any thumbnail looked wrong.
+- **Judge** (Gt-BRW): scroll fast through the sample library; answer fast, OK or slow, and whether any thumbnail looked wrong.
 
 ### FR-BRW-03 Selection and shortcuts
 *Phase 2 · Core · Traces: ORG-12, META-05*
@@ -116,7 +116,7 @@ A full-screen mode moves through photos with arrow keys; the next and previous i
 ### FR-BRW-10 Unsupported and damaged files
 *Phase 2 · Foundation · Traces: ADR-0004*
 Files of unsupported or damaged type appear as a clear placeholder with the reason, never as a blank tile or a crash.
-- **Auto** (`ui`, `snapshot`): placeholders for each failure kind.
+- **Auto** (`ui`, `snapshot`, `integration`): placeholders for each failure kind; every damaged entry recorded by FR-LIB-10 is shown with its reason.
 
 ### FR-BRW-11 Remembered view state
 *Phase 2 · Core · Traces: VIEW-01, META-05*

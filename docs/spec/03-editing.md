@@ -61,7 +61,7 @@ The same recipe on the same original gives the same pixels on every machine and 
 
 ### FR-ENG-10 RAW editing (gated on the RAW decoder licence)
 *Phase 3 · Widening · Traces: EDIT-23, MOD-02*
-Once a RAW decoder is chosen under ADR-0005, RAW files edit non-destructively like any other photo, with the camera's embedded preview as a first display. If no licence-compatible decoder is accepted, this requirement moves to Phase 6 and RAW stays detect-and-preview only.
+Once a RAW decoder is chosen under ADR-0005, RAW files edit non-destructively like any other photo, with the camera's embedded preview as a first display. It is **not part of the Gt-CRP trial**: as a Widening item it starts only after gate Gf. If no licence-compatible decoder is accepted, it moves to Phase 6 and RAW stays detect-and-preview only.
 - **Auto** (`golden`, `integration`): licensed sample RAW files from several makers decode to references within tolerance; the sidecar and original are untouched.
 - **Gate:** the decoder choice is an architecture review (Gx-arch) because the obvious Rust RAW crates are LGPL (ADR-0004).
 

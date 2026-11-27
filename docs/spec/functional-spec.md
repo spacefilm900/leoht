@@ -58,7 +58,7 @@ judgement check, run by Keith in the named trial.
 Every requirement must have at least one `Auto` check, or be explicitly judgement-only with a rubric. The rules:
 
 1. **Put a number on it when a number exists.** "Fast" becomes a budget (FR-FND-07) that CI enforces, *and* a judgement
-   question ("fast, ok or slow") because a passing number can still feel wrong.
+   question ("fast, OK or slow") because a passing number can still feel wrong.
 2. **Use a reference when a number does not exist.** "Colour looks right" becomes charts and ICC profiles rendered to
    reference values (`golden`), *and* a side-by-side with the system viewer on Keith's Mac (FR-BRW-06).
 3. **Write the rubric before the trial.** Each `Judge` check states the question, the answer scale and the pass rule
@@ -88,7 +88,7 @@ feedback, a first result within 5 minutes, easy removal, feature-flagged where a
 | FR-FND | Foundations and guarantees | Checked in every trial (no trial of its own) | 1, 2, 3 | 13 | 0 | 13 | 0 | [01-foundations.md](01-foundations.md) |
 | FR-LIB | Library, scan and index | Gt-LIB (CLI, at Phase 1 exit) | 1 | 10 | 0 | 10 | 0 | [02-library-and-viewing.md](02-library-and-viewing.md) |
 | FR-BRW | Browse and view | Gt-BRW (**proposed first trial**) | 2 | 11 | 10 | 1 | 0 | [02-library-and-viewing.md](02-library-and-viewing.md) |
-| FR-ENG | Edit engine, save and export | Gt-CRP (ships with crop) | 3 | 11 | 7 | 3 | 1 | [03-editing.md](03-editing.md) |
+| FR-ENG | Edit engine, save and export | Gt-CRP (ships with crop; FR-ENG-10 excluded until after Gf) | 3 | 11 | 7 | 3 | 1 | [03-editing.md](03-editing.md) |
 | FR-CRP | Crop and geometry | Gt-CRP | 3 | 8 | 7 | 1 | 0 | [03-editing.md](03-editing.md) |
 | FR-ADJ | Adjust | Gt-ADJ | 3 | 8 | 8 | 0 | 0 | [03-editing.md](03-editing.md) |
 | FR-RAT | Rate, cull, caption and tag | Gt-RAT | 4, 6 | 8 | 5 | 2 | 1 | [04-organisation.md](04-organisation.md) |
@@ -130,7 +130,7 @@ Recommended as the first graphical trial, and the first one Keith feels hands-on
 
 What Keith would try (about 10 minutes): open the bundled sample library; scroll the grid fast; open a photo; hold the right
 arrow through 100 photos in full screen; compare colour with macOS Preview; switch dark and light; reveal a photo in Finder.
-Pass rule: each `Judge` check in FR-BRW-01 to -09 answered at least "ok", and no blocker issue left open.
+Pass rule: each `Judge` check in FR-BRW-01 to -09 answered at least "OK", and no blocker issue left open.
 
 Suggested dry run: at the Phase 1 exit, a CLI-only **Gt-LIB** trial (one command, bundled samples) rehearses the
 packaging and feedback pipeline before the first graphical trial depends on it.
@@ -141,8 +141,8 @@ an unsigned build needs the one-line Gatekeeper step in the checklist (T4).
 
 ### Trial sequence and the focused core
 
-Core Principle 6 sets the order: Gt-BRW, Gt-CRP (engine, crop and geometry), Gt-ADJ, Gt-RAT, Gt-ALB, Gt-FIL, then gate Gf
-(quality bar) before any Widening item, then Gt-MAC (which holds the Mac polish plus two Widening items that wait for Gf).
+Core Principle 6 sets the order: Gt-BRW, Gt-CRP (engine, crop and geometry; FR-ENG-10 RAW editing is excluded because it is Widening), Gt-ADJ, Gt-RAT, Gt-ALB, Gt-FIL, then gate Gf
+(quality bar) before any Widening item, then Gt-MAC (which holds the Mac polish plus three Widening items, FR-MAC-06 to -08, that wait for Gf).
 
 ## 5. Requirement files
 
