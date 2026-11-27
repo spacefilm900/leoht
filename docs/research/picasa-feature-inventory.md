@@ -74,7 +74,7 @@ slideshow) we say so and propose one; those are suggestions for you to approve, 
 | 9. Metadata, duplicates, hidden items and misc | 3 | 3 | 1 | 0 | 0 | 7 |
 | **Subtotal: Picasa-derived features** | **39** | **33** | **13** | **12** | **0** | **97** |
 | Leoht additions (committed) | 0 | 0 | 0 | 0 | 5 | 5 |
-| **Total committed rows** | **39** | **33** | **13** | **12** | **5** | **102** |
+| **Total inventoried rows** | **39** | **33** | **13** | **12** | **5** | **102** |
 | *Future possibilities (not committed; separate list)* | | | | | | *14* |
 
 Counts are of the rows in sections 1 to 9 below, plus the five committed Leoht additions (`Add`: our own ideas, not Picasa's). A row sometimes groups several closely related Picasa functions, such as a pack of effects. Future possibilities are listed separately and are not counted as commitments. They are a planning aid, not a feature-point estimate.
@@ -87,7 +87,7 @@ Counts are of the rows in sections 1 to 9 below, plus the five committed Leoht a
 4. **Drop everything cloud, disc or novelty.** Web-album upload and sync, collaborative albums, online contacts, movie maker, gift discs, burned slideshows, the screensaver and the online editor add-on (12 rows marked Drop). Novelty effect packs are deferred, not built early (EDIT-15).
 5. **Import has no home in the plan.** Picasa's import (device detection, date-named folders, skip duplicates, safe card clearing) is where folder structure begins. We suggest pulling a basic import earlier than Phase 6+ (OQ-3).
 6. **Phase 5 is the natural home** for slideshow, email via the share sheet, quick standalone viewer and file associations.
-7. **Picasa interoperability is a live question.** At least four active open-source projects read and write Picasa's per-folder metadata so old libraries keep working [S44-S48]. Doing the same would need a legal and clean-room decision first (OQ-1).
+7. **Picasa interoperability is a live question.** Several active open-source projects work with Picasa's per-folder metadata: PicasaPy documents reading and writing it [S44], photon shares star ratings with Picasa's ini file [S48], and Picasso imports stars, captions and rotation [S46]; Picco describes itself as keeping a Picasa library alive [S45]. We did not verify read and write support for Picco or Dalica [S47]. Doing the same would need a legal and clean-room decision first (OQ-1).
 8. **Avoid Google's names.** Do not reuse "I'm Feeling Lucky" or effect names that echo third-party camera brands; use our own labels (EDIT-06, EDIT-15).
 9. **Leoht goes beyond Picasa in five committed places** (geometry suite, culling mode, copy/paste edits, similar-photo stacks, wide-colour and HDR display; ADD-01 to ADD-05), and records 14 further ideas as future possibilities (FUT-01 to FUT-14). Accessibility, performance and the originals guarantee may be promoted to requirements in the functional spec.
 10. **Our closest peers now exist.** Two Rust projects (Dalica, Picco) state a near-identical Picasa-faithful, local-first, sidecar-plus-cache goal; see the [Picasa-inspired projects](#picasa-inspired-projects) section for positioning.
@@ -122,7 +122,7 @@ Counts are of the rows in sections 1 to 9 below, plus the five committed Leoht a
 | ORG-01 | Folders versus albums | Folders were real directories; albums were app-only lists that pointed at photos. Photo lives in one folder, may appear in many albums. | [S01] [S18] [S22] | **Keep** | 4 | Exactly the plan's 'albums as virtual collections'; the distinction is the heart of the model (ADR-0001). |
 | ORG-02 | Album create and edit | Select photos, choose 'add to album', name it; removing a photo from an album left the file alone. | [S01] [S18] | **Keep** | 4 | Core organisation feature. |
 | ORG-03 | Photo tray | A holding area collected photos from any folders for batch actions (hold, clear), then drove album, export, email and print. | [S01] [S02] [S07] | **Modernise** | 4 | Keep as a persistent 'selection basket' that survives restarts and can be saved as an album. |
-| ORG-04 | Manual order inside folders and albums | Drag and drop changed display order; batch rename followed that order. | [S22] | **Keep** | 4 | Store custom order in the album definition; for folders, as optional sort key in sidecars or index. |
+| ORG-04 | Manual order inside folders and albums | Drag and drop changed display order; batch rename followed that order. | [S22] | **Keep** | 4 | Store custom order in the album definition; for folders, as a durable sort key in sidecars (the index may cache it, but must not be its only home, so a rebuilt index keeps the order). |
 | ORG-05 | Album data survives reinstall | From 3.9, album membership was written alongside other edit data so albums could be restored after reinstalling or moving machines. | [S11] | **Modernise** | 4 | Albums span folders, so they cannot live in a per-image sidecar alone; decide the portable album file in an ADR. |
 | ORG-06 | Star favourite | A single yellow star toggled with the space bar or button; a button selected all starred photos. | [S18] | **Modernise** | 4 | Keep one-key starring; offer 0-5 ratings (modern norm) and map to XMP rating on export. |
 | ORG-07 | Captions | One caption per photo, typed under the thumbnail, shown in thumbnails, slideshows and prints; stored inside the file as IPTC data. Not batch-editable. | [S22] [S16] [S26] | **Keep** | 4 | Keep captions; allow batch caption (the gap users noticed). Storage policy: see META-01. |
@@ -163,7 +163,7 @@ Picasa grouped edits into Basic fixes, Tuning and Effects tabs.
 | EDIT-07 | Fill light, highlights, shadows | Sliders to lift dark areas, tame or boost bright areas, deepen shadows. | [S02] [S26] [S22] | **Keep** | 3 | Maps to plan's exposure/contrast family; core tone controls. |
 | EDIT-08 | Colour temperature and neutral picker | Warm/cool slider, and a picker to mark a neutral grey/white point. | [S26] [S22] | **Keep** | 3 | White balance is essential, especially for RAW later. |
 | EDIT-09 | Retouch | A brush to remove spots and blemishes by clicking. | [S02] [S26] [S22] | **Defer** | 6+ | Heal/clone is a large feature; do after core recipe ops. |
-| EDIT-10 | Text on image | Add and style text over a photo. | [S02] [S13] [S26] | **Defer** | 6+ | Low priority; overlap with export watermark (OUT-03). |
+| EDIT-10 | Text on image | Add and style text over a photo. | [S02] [S13] [S26] | **Defer** | 6+ | Low priority; overlap with export watermark (OUT-02). |
 | EDIT-11 | Sharpen and saturation | A sharpen slider (also able to soften) and a colour-intensity slider from monochrome to vivid. | [S23] [S26] [S22] | **Keep** | 3 | Plan item (saturation); sharpen is standard. |
 | EDIT-12 | Core look effects | Sepia, black-and-white, warm-up, colour tint with adjustable preserved colour. | [S23] [S26] | **Keep** | 3 | Cheap, popular; implement as parametric recipe ops. |
 | EDIT-13 | Film grain, glow, soft focus | Grain, bright-area glow, and softening around an adjustable centre point. | [S23] [S26] | **Defer** | 6+ | Nice-to-have; implement after local masks. |

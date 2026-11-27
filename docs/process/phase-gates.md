@@ -40,9 +40,9 @@ A trial that fails any item below is not ready to hand to Keith. Master checks e
 
 | # | Requirement | How it is checked |
 |---|-------------|-------------------|
-| T1 | **One step to get it:** a single download, or a single copy-paste command. | The trial issue contains exactly one link or one command. |
+| T1 | **One step to get it:** a single download, or a single copy-paste command. | The get-it instructions in the trial issue are exactly one download link or one command (the feedback link in T7 is separate). |
 | T2 | **No toolchain:** no Rust, Xcode tools or build steps for the tester. | Cold-start rehearsal (below) uses a machine without a Rust toolchain. |
-| T3 | **Photos ready:** sample photos are bundled (with provenance recorded in `tests/fixtures/PROVENANCE.md`), or the tester points at a folder in one step. | Rehearsal reaches the feature without the tester supplying files. |
+| T3 | **Photos ready:** sample photos are bundled (with provenance recorded in `tests/fixtures/PROVENANCE.md`), or the tester points at a folder in one step. | Rehearsal reaches the feature using only the bundled samples, or, where there are none, a sample folder chosen in one step (the rehearsal supplies it). |
 | T4 | **Runs on macOS Apple Silicon** (arm64, current macOS), tested before hand-off. | Built on the `macos-15` runner; the rehearsal is run on Apple Silicon. First-launch Gatekeeper steps (unsigned builds) are written out in one line in the checklist. |
 | T5 | **Originals are never modified:** the trial is read-only by default, or works on copies. | Automated test: hash the sample library before and after a trial session; they must match. |
 | T6 | **A short "what to try / what to tell us" checklist:** at most 10 items, doable in about 10 minutes. | The checklist is in the trial issue and `docs/process/trial-checklist-template.md` is followed. |
@@ -66,7 +66,7 @@ in the issue. The rehearsal is the evidence that T1 to T10 hold.
 ## Phase exit checklist (every phase)
 - [ ] Working code merged; CI green on macOS and Linux
 - [ ] Core Principle 6: does the focused core (organise, view, crop, adjust) meet its quality bar before this phase widens scope?
-- [ ] Gt: every feature group shipped this phase had an early trial, with Keith's trial sign-off recorded (or a recorded reason none was needed)
+- [ ] Gt: every feature group shipped this phase had an early trial, with Keith's trial sign-off recorded (or a waiver that Keith recorded on the issue)
 - [ ] Tests at the right levels (unit, integration, golden/perf/volume where the phase calls for them)
 - [ ] ADRs written/updated; `STATUS.md` current
 - [ ] "How we built X" narrative in `narratives/`
