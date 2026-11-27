@@ -1,7 +1,6 @@
 //! Reading and writing photo rows.
 
-use std::path::Path;
-
+use camino::Utf8Path;
 use leoht_core::{ContentHash, Photo, PhotoFormat, RelPath};
 use rusqlite::{Connection, params};
 
@@ -17,7 +16,7 @@ impl Catalog {
     ///
     /// # Errors
     /// SQLite failure, or a database from a newer Leoht.
-    pub fn open(path: &Path) -> Result<Self, CatalogError> {
+    pub fn open(path: &Utf8Path) -> Result<Self, CatalogError> {
         Self::from_connection(Connection::open(path)?)
     }
 
@@ -42,30 +41,21 @@ impl Catalog {
     /// SQLite failure.
     pub fn upsert_photos(&mut self, photos: &[Photo]) -> Result<(), CatalogError> {
         let tx = self.conn.transaction()?;
-        {
-            let mut stmt = tx.prepare_cached(
-                "INSERT INTO photos (path, folder, format, size_bytes, modified_unix_secs, content_hash)
-                 VALUES (?1, ?2, ?3, ?4, ?5, ?6)
-                 ON CONFLICT(path) DO UPDATE SET
-                     folder = excluded.folder,
-                     format = excluded.format,
-                     size_bytes = excluded.size_bytes,
-                     modified_unix_secs = excluded.modified_unix_secs,
-                     content_hash = excluded.content_hash",
-            )?;
-            for photo in photos {
-                let folder = photo.folder().map_or_else(String::new, |f| f.to_string());
-                stmt.execute(params![
-                    photo.path.as_str(),
-                    folder,
-                    format_to_str(photo.format),
-                    // SQLite integers are i64; photo files are nowhere near 8 EiB.
-                    i64::try_from(photo.size_bytes).unwrap_or(i64::MAX),
-                    photo.modified_unix_secs,
-                    photo.hash.as_ref().map(ContentHash::as_str),
-                ])?;
-            }
-        }
+        upsert_in(&tx, photos)?;
+        tx.commit()?;
+        Ok(())
+    }
+
+    /// Replaces the whole catalog with `photos` in **one transaction**: delete and
+    /// insert commit together or not at all, so a failed rebuild leaves the previous
+    /// index intact (unlike calling [`Catalog::clear`] then [`Catalog::upsert_photos`]).
+    ///
+    /// # Errors
+    /// SQLite failure; the previous contents are kept.
+    pub fn replace_photos(&mut self, photos: &[Photo]) -> Result<(), CatalogError> {
+        let tx = self.conn.transaction()?;
+        tx.execute("DELETE FROM photos", [])?;
+        upsert_in(&tx, photos)?;
         tx.commit()?;
         Ok(())
     }
@@ -121,7 +111,8 @@ impl Catalog {
         .collect()
     }
 
-    /// Removes every photo row, ready for a full rebuild from a fresh scan.
+    /// Removes every photo row (an explicit "forget everything"). To rebuild from a
+    /// fresh scan use [`Catalog::replace_photos`], which cannot lose the old data on failure.
     ///
     /// # Errors
     /// SQLite failure.
@@ -129,6 +120,33 @@ impl Catalog {
         self.conn.execute("DELETE FROM photos", [])?;
         Ok(())
     }
+}
+
+/// Upserts `photos` using an already-open transaction (the caller commits).
+fn upsert_in(tx: &rusqlite::Transaction<'_>, photos: &[Photo]) -> Result<(), CatalogError> {
+    let mut stmt = tx.prepare_cached(
+        "INSERT INTO photos (path, folder, format, size_bytes, modified_unix_secs, content_hash)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6)
+         ON CONFLICT(path) DO UPDATE SET
+             folder = excluded.folder,
+             format = excluded.format,
+             size_bytes = excluded.size_bytes,
+             modified_unix_secs = excluded.modified_unix_secs,
+             content_hash = excluded.content_hash",
+    )?;
+    for photo in photos {
+        let folder = photo.folder().map_or_else(String::new, |f| f.to_string());
+        stmt.execute(params![
+            photo.path.as_str(),
+            folder,
+            format_to_str(photo.format),
+            // SQLite integers are i64; photo files are nowhere near 8 EiB.
+            i64::try_from(photo.size_bytes).unwrap_or(i64::MAX),
+            photo.modified_unix_secs,
+            photo.hash.as_ref().map(ContentHash::as_str),
+        ])?;
+    }
+    Ok(())
 }
 
 /// Stable on-disk names for formats (decoupled from the Rust enum's spelling).
@@ -159,6 +177,7 @@ fn format_from_str(s: &str) -> Result<PhotoFormat, CatalogError> {
 mod tests {
     use super::*;
     use crate::SCHEMA_VERSION;
+    use camino::Utf8PathBuf;
 
     fn photo(path: &str, format: PhotoFormat) -> Photo {
         Photo {
@@ -232,7 +251,7 @@ mod tests {
     #[test]
     fn reopening_a_file_database_is_idempotent_and_keeps_data() {
         let dir = tempfile::tempdir().unwrap();
-        let db = dir.path().join("catalog.sqlite");
+        let db = Utf8PathBuf::from_path_buf(dir.path().join("catalog.sqlite")).unwrap();
         {
             let mut cat = Catalog::open(&db).unwrap();
             cat.upsert_photos(&[photo("a.jpg", PhotoFormat::Jpeg)])
@@ -245,7 +264,7 @@ mod tests {
     #[test]
     fn newer_schema_is_refused() {
         let dir = tempfile::tempdir().unwrap();
-        let db = dir.path().join("catalog.sqlite");
+        let db = Utf8PathBuf::from_path_buf(dir.path().join("catalog.sqlite")).unwrap();
         Connection::open(&db)
             .unwrap()
             .pragma_update(None, "user_version", SCHEMA_VERSION + 1)
@@ -263,5 +282,46 @@ mod tests {
             .unwrap();
         cat.clear().unwrap();
         assert_eq!(cat.photo_count().unwrap(), 0);
+    }
+
+    #[test]
+    fn replace_photos_swaps_contents_in_one_transaction() {
+        let mut cat = Catalog::open_in_memory().unwrap();
+        cat.upsert_photos(&[photo("old.jpg", PhotoFormat::Jpeg)])
+            .unwrap();
+        cat.replace_photos(&[
+            photo("new1.jpg", PhotoFormat::Jpeg),
+            photo("new2.png", PhotoFormat::Png),
+        ])
+        .unwrap();
+        assert_eq!(cat.photo_count().unwrap(), 2);
+        assert!(
+            cat.photo(&RelPath::new("old.jpg").unwrap())
+                .unwrap()
+                .is_none()
+        );
+    }
+
+    #[test]
+    fn failed_replace_keeps_the_previous_catalog() {
+        let mut cat = Catalog::open_in_memory().unwrap();
+        cat.upsert_photos(&[photo("keep.jpg", PhotoFormat::Jpeg)])
+            .unwrap();
+        // Force the insert step to fail after the delete has run, inside the same transaction.
+        cat.conn
+            .execute_batch(
+                "CREATE TRIGGER boom BEFORE INSERT ON photos BEGIN SELECT RAISE(ABORT, 'boom'); END;",
+            )
+            .unwrap();
+        assert!(
+            cat.replace_photos(&[photo("new.jpg", PhotoFormat::Jpeg)])
+                .is_err()
+        );
+        assert_eq!(cat.photo_count().unwrap(), 1);
+        assert!(
+            cat.photo(&RelPath::new("keep.jpg").unwrap())
+                .unwrap()
+                .is_some()
+        );
     }
 }

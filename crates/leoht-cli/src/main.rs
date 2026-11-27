@@ -29,7 +29,7 @@ enum Command {
         root: Utf8PathBuf,
         /// Catalog file to write.
         #[arg(long, default_value = "leoht-catalog.sqlite")]
-        db: std::path::PathBuf,
+        db: Utf8PathBuf,
     },
 }
 
@@ -55,14 +55,10 @@ fn main() -> Result<()> {
             let report =
                 leoht_scan::scan_library(&root).with_context(|| format!("scanning {root}"))?;
             let mut catalog = Catalog::open(&db).context("opening catalog")?;
-            // The catalog is a cache: rebuilding from scratch is always safe.
-            catalog.clear()?;
-            catalog.upsert_photos(&report.photos)?;
-            println!(
-                "indexed {} photos into {}",
-                catalog.photo_count()?,
-                db.display()
-            );
+            // The catalog is a cache, so a full rebuild is safe, and `replace_photos`
+            // does the swap in one transaction: a failure keeps the previous index.
+            catalog.replace_photos(&report.photos)?;
+            println!("indexed {} photos into {}", catalog.photo_count()?, db);
         }
     }
     Ok(())

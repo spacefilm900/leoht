@@ -66,10 +66,9 @@ fn a_small_library_flows_through_every_crate() {
         "editing must never touch the original"
     );
 
-    // The catalog is a cache: wipe it, rescan, and the same state comes back.
-    catalog.clear().unwrap();
+    // The catalog is a cache: rebuild it from a rescan and the same state comes back.
     catalog
-        .upsert_photos(&scan_library(&lib.root).unwrap().photos)
+        .replace_photos(&scan_library(&lib.root).unwrap().photos)
         .unwrap();
     assert_eq!(catalog.photo_count().unwrap(), 40);
     // ...and the sidecar file (not a photo) is not indexed.
