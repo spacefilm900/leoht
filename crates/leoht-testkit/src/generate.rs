@@ -4,10 +4,10 @@ use std::fs::{self, OpenOptions};
 use std::io::Write as _;
 
 use camino::{Utf8Path, Utf8PathBuf};
-use image::{ImageEncoder, RgbImage, codecs::jpeg::JpegEncoder, codecs::png::PngEncoder};
 use thiserror::Error;
 
 use crate::rng::SplitMix64;
+use crate::synth::{encode_jpeg, encode_png};
 
 /// Shape of the library to generate.
 #[derive(Debug, Clone)]
@@ -18,14 +18,43 @@ pub struct LibrarySpec {
     pub seed: u64,
     /// Photos per leaf folder.
     pub photos_per_folder: usize,
+    /// Pixel width of generated JPEG and PNG files.
+    pub width: u32,
+    /// Pixel height of generated JPEG and PNG files.
+    pub height: u32,
+    /// Give JPEGs camera-like EXIF (date, camera, orientation, a 160x120
+    /// embedded preview), so scans exercise the metadata path.
+    pub exif: bool,
 }
 
 impl Default for LibrarySpec {
+    /// Tiny 16x16 images without EXIF: fast to write, for functional tests.
     fn default() -> Self {
         Self {
             count: 1_000,
             seed: 0x1E_0F7,
             photos_per_folder: 100,
+            width: 16,
+            height: 16,
+            exif: false,
+        }
+    }
+}
+
+impl LibrarySpec {
+    /// The volume-test library (FR-FND-07): 640x480 JPEGs with camera-like
+    /// EXIF and an embedded preview, 100 photos per folder. Real photos are
+    /// far bigger (a 12 MP JPEG is 3 to 5 MB); this size keeps a 10k library
+    /// generatable on CI in about a minute, at the cost of understating
+    /// decode time. Volume reports say so.
+    #[must_use]
+    pub fn volume(count: usize) -> Self {
+        Self {
+            count,
+            width: 640,
+            height: 480,
+            exif: true,
+            ..Self::default()
         }
     }
 }
@@ -61,9 +90,6 @@ pub enum TestkitError {
     EmptyFolders,
 }
 
-/// Side length of every generated image: small, so 100k files stay fast and light.
-const SIZE: u32 = 16;
-
 /// Generates `spec.count` files under `root`, laid out as
 /// `year-NNNN/folder-NNNNN/IMG_NNNNNN.<ext>`.
 ///
@@ -89,8 +115,8 @@ pub fn generate_library(
         // Each photo gets its own RNG stream so files are independent of generation order.
         let mut rng = SplitMix64::new(spec.seed ^ (index as u64).wrapping_mul(0x9E37_79B9));
         let (ext, bytes) = match rng.next_u64() % 20 {
-            0..=15 => ("jpg", encode_jpeg(&mut rng)?),
-            16..=17 => ("png", encode_png(&mut rng)?),
+            0..=15 => ("jpg", encode_jpeg(&mut rng, spec, index)?),
+            16..=17 => ("png", encode_png(&mut rng, spec)?),
             18 => ("heic", placeholder(HEIC_MAGIC, &mut rng)),
             _ => ("cr2", placeholder(CR2_MAGIC, &mut rng)),
         };
@@ -113,47 +139,6 @@ pub fn generate_library(
 fn write_new(path: &Utf8Path, bytes: &[u8]) -> std::io::Result<()> {
     let mut file = OpenOptions::new().write(true).create_new(true).open(path)?;
     file.write_all(bytes)
-}
-
-/// A smooth gradient between seeded endpoints: cheap and deterministic
-/// (it compresses unlike a real photo, which is fine for volume tests).
-fn random_image(rng: &mut SplitMix64) -> RgbImage {
-    // Six random bytes = a start and an end value for each of R, G, B.
-    let ends = rng.next_u64().to_le_bytes();
-    // Linear blend between `ends[2*ch]` and `ends[2*ch + 1]` at position `pos` in 0..SIZE.
-    let blend = |channel: usize, pos: u32| {
-        let (from, to) = (ends[2 * channel], ends[2 * channel + 1]);
-        let span = u32::from(from.abs_diff(to));
-        let base = u32::from(from.min(to));
-        u8::try_from(base + span * pos / (SIZE - 1)).unwrap_or(u8::MAX)
-    };
-    RgbImage::from_fn(SIZE, SIZE, |x, y| {
-        image::Rgb([blend(0, x), blend(1, y), blend(2, u32::midpoint(x, y))])
-    })
-}
-
-fn encode_jpeg(rng: &mut SplitMix64) -> Result<Vec<u8>, TestkitError> {
-    let img = random_image(rng);
-    let mut out = Vec::new();
-    JpegEncoder::new_with_quality(&mut out, 80).write_image(
-        img.as_raw(),
-        SIZE,
-        SIZE,
-        image::ExtendedColorType::Rgb8,
-    )?;
-    Ok(out)
-}
-
-fn encode_png(rng: &mut SplitMix64) -> Result<Vec<u8>, TestkitError> {
-    let img = random_image(rng);
-    let mut out = Vec::new();
-    PngEncoder::new(&mut out).write_image(
-        img.as_raw(),
-        SIZE,
-        SIZE,
-        image::ExtendedColorType::Rgb8,
-    )?;
-    Ok(out)
 }
 
 /// An ISOBMFF `ftyp` box with HEIC brands: what makes a file detectable as HEIC.
@@ -228,6 +213,29 @@ mod tests {
     }
 
     #[test]
+    fn volume_spec_writes_camera_like_jpegs() {
+        let (_dir, root, _) = generate(&LibrarySpec {
+            photos_per_folder: 10,
+            ..LibrarySpec::volume(10)
+        });
+        let first = root.join("year-2000/folder-00000/IMG_000000.jpg");
+        let img = image::open(&first).unwrap();
+        assert_eq!((img.width(), img.height()), (640, 480));
+        let bytes = fs::read(&first).unwrap();
+        let exif = exif::Reader::new()
+            .read_from_container(&mut std::io::Cursor::new(bytes))
+            .unwrap();
+        assert!(
+            exif.get_field(exif::Tag::DateTimeOriginal, exif::In::PRIMARY)
+                .is_some()
+        );
+        assert!(
+            exif.get_field(exif::Tag::JPEGInterchangeFormat, exif::In::THUMBNAIL)
+                .is_some()
+        );
+    }
+
+    #[test]
     fn zero_photos_per_folder_is_rejected() {
         let dir = tempfile::tempdir().unwrap();
         let root = Utf8PathBuf::from_path_buf(dir.path().to_path_buf()).unwrap();
@@ -248,7 +256,7 @@ mod tests {
         let spec = LibrarySpec {
             count: 1,
             seed: 1,
-            photos_per_folder: 100,
+            ..LibrarySpec::default()
         };
         // Pre-create the exact file the generator would write first.
         let victim = root.join("year-2000/folder-00000").join("IMG_000000.jpg");

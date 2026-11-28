@@ -19,7 +19,7 @@ use std::path::PathBuf;
 use std::process::Command;
 
 use anyhow::{Context, Result, bail};
-use camino::Utf8PathBuf;
+use camino::{Utf8Path, Utf8PathBuf};
 use clap::{Parser, Subcommand};
 use leoht_testkit::{LibrarySpec, generate_library};
 
@@ -46,6 +46,10 @@ enum Task {
         /// Photos per leaf folder.
         #[arg(long, default_value_t = LibrarySpec::default().photos_per_folder)]
         per_folder: usize,
+        /// Tiny 16x16 images without EXIF instead of the volume-test library
+        /// (640x480 JPEGs with EXIF and embedded previews).
+        #[arg(long)]
+        tiny: bool,
     },
     /// Re-record golden-image references (review the diff before committing!).
     Bless,
@@ -83,19 +87,8 @@ fn main() -> Result<()> {
             out,
             seed,
             per_folder,
-        } => {
-            let spec = LibrarySpec {
-                count,
-                seed,
-                photos_per_folder: per_folder,
-            };
-            let report = generate_library(&out, &spec).context("generating library")?;
-            println!(
-                "wrote {} photos in {} folders to {out}",
-                report.photos, report.folders
-            );
-            Ok(())
-        }
+            tiny,
+        } => gen_library(count, &out, seed, per_folder, tiny),
         Task::Bless => run(
             "cargo",
             &["test", "-p", "leoht-it", "--test", "golden"],
@@ -154,6 +147,33 @@ fn main() -> Result<()> {
             )
         }
     }
+}
+
+/// `cargo xtask gen-library`.
+fn gen_library(
+    count: usize,
+    out: &Utf8Path,
+    seed: u64,
+    per_folder: usize,
+    tiny: bool,
+) -> Result<()> {
+    let base = if tiny {
+        LibrarySpec::default()
+    } else {
+        LibrarySpec::volume(count)
+    };
+    let spec = LibrarySpec {
+        count,
+        seed,
+        photos_per_folder: per_folder,
+        ..base
+    };
+    let report = generate_library(out, &spec).context("generating library")?;
+    println!(
+        "wrote {} photos in {} folders to {out}",
+        report.photos, report.folders
+    );
+    Ok(())
 }
 
 /// Runs a command, inheriting stdio, and fails if it exits non-zero.

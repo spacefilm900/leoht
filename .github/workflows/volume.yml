@@ -1,33 +1,43 @@
-# Volume tests: scan + hash + index a large synthetic library, and report timings.
+# Volume and performance check (FR-FND-07, FR-LIB-09, FR-FND-02).
 #
-# STUB for Phase 0: the job is wired up and runs, but there are no pass/fail
-# time budgets yet. Phase 1 targets: synthetic 1k and 10k photos, with budgets
-# recorded from the first baseline. The 100k suite belongs to Phase 6.
-# Never part of the required PR checks: it is slow and runs nightly/on demand.
+# Generates deterministic 1k and 10k synthetic libraries and measures cold scan
+# (OS page cache dropped first), first 500 photos visible during the scan, warm
+# start, rescans, rebuild and thumbnails against the FR-FND-07 budgets and the
+# recorded baselines in perf/baselines.json (>25% slower than baseline, beyond a
+# 100 ms noise floor, fails). Also records peak memory of the CLI on the 10k
+# library and quick criterion benchmarks. Results are in the job summary and
+# the `volume-<os>` artifact.
+#
+# Runs on PRs that touch Rust code, on main, nightly and on demand. It is not
+# yet part of `CI OK`: shared runners are noisy, so it should earn trust with a
+# few baselines before Keith makes it a required check (see STATUS.md).
 name: Volume
 
 on:
+  pull_request:
+    paths: ["crates/**", "tests/**", "perf/**", "Cargo.lock", ".github/workflows/volume.yml"]
+  push:
+    branches: [main]
   schedule:
     - cron: "17 3 * * *"       # nightly, 03:17 UTC
   workflow_dispatch:
     inputs:
-      count:
-        description: "Number of synthetic photos to generate"
+      counts:
+        description: "Comma-separated library sizes"
         required: true
-        default: "10000"
+        default: "1000,10000"
 
 permissions:
   contents: read
 
 concurrency:
-  group: volume-${{ github.ref }}
+  group: volume-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 env:
   CARGO_TERM_COLOR: always
   CARGO_INCREMENTAL: "0"
-  # Scheduled runs have no inputs, so fall back to 10k.
-  VOLUME_COUNT: ${{ github.event.inputs.count || '10000' }}
+  LEOHT_VOLUME_COUNTS: ${{ github.event.inputs.counts || '1000,10000' }}
 
 jobs:
   volume:
@@ -37,19 +47,60 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-15, ubuntu-latest]
+        include:
+          - os: macos-15
+            platform: macos-15
+            drop_caches: sync && sudo purge
+            time_cmd: /usr/bin/time -l
+          - os: ubuntu-latest
+            platform: ubuntu
+            drop_caches: sync && echo 3 | sudo tee /proc/sys/vm/drop_caches > /dev/null
+            time_cmd: /usr/bin/time -v
     steps:
       - uses: actions/checkout@v7
       - name: Install pinned toolchain
         run: rustup toolchain install
       - uses: Swatinem/rust-cache@v2
-      - name: Generate synthetic library
-        run: cargo xtask gen-library --count "$VOLUME_COUNT" --out target/volume-library
-      - name: Run ignored volume tests
-        # Absolute path: cargo runs the test from the package folder, not the repo root.
-        run: >
-          cargo test -p leoht-it --test volume --release -- --ignored --nocapture
+      - name: Build (release)
+        run: cargo build --release -p leoht-cli && cargo test --release -p leoht-it --test volume --no-run
+      - name: Volume test against FR-FND-07 budgets and baselines
+        run: cargo test --release -p leoht-it --test volume -- --ignored --nocapture
         env:
-          LEOHT_VOLUME_LIBRARY: ${{ github.workspace }}/target/volume-library
-          # Independent of the scanner: the count we asked the generator for.
-          LEOHT_VOLUME_EXPECTED_COUNT: ${{ env.VOLUME_COUNT }}
+          LEOHT_PERF_PLATFORM: ${{ matrix.platform }}
+          LEOHT_PERF_OUT: ${{ github.workspace }}/perf-results
+          LEOHT_DROP_CACHES_CMD: ${{ matrix.drop_caches }}
+      - name: Peak memory of the CLI on a 10k library
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "$RUNNER_OS" = Linux ] && [ ! -x /usr/bin/time ]; then sudo apt-get install -y -qq time; fi
+          cargo xtask gen-library --count 10000 --out "$RUNNER_TEMP/lib10k"
+          mkdir -p perf-results
+          for cmd in scan list thumbs; do
+            ${{ matrix.time_cmd }} target/release/leoht --cache-dir "$RUNNER_TEMP/cache" $cmd "$RUNNER_TEMP/lib10k" \
+              > /dev/null 2> "perf-results/rss-$cmd.txt"
+            rss=$(grep -Ei 'maximum resident set size' "perf-results/rss-$cmd.txt" | sed 's/^[[:space:]]*//')
+            echo "leoht $cmd: $rss" | tee -a perf-results/rss.txt
+          done
+      - name: Criterion benchmarks (quick)
+        if: always()
+        run: cargo bench -p leoht-library --bench library -- --quick 2>&1 | tee perf-results/criterion.txt
+      - name: Job summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "## Volume (${{ matrix.platform }})"
+            cat perf-results/volume.md 2>/dev/null || echo "volume test produced no report"
+            echo; echo "### Peak RSS (macOS: bytes; Linux: KiB)"; echo '```'
+            cat perf-results/rss.txt 2>/dev/null || true
+            echo '```'; echo "### Criterion (quick)"; echo '```'
+            grep -E 'time:|^[a-z0-9_]+/' perf-results/criterion.txt 2>/dev/null || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: volume-${{ matrix.platform }}
+          path: perf-results/

@@ -773,6 +773,7 @@ version = "0.0.0"
 dependencies = [
  "blake3",
  "camino",
+ "criterion",
  "image",
  "leoht-catalog",
  "leoht-core",

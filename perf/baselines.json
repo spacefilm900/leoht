@@ -1,0 +1,4 @@
+{
+  "rule": "FR-FND-07: a metric more than 25% slower than its baseline fails the volume check, unless the difference is under 100 ms (noise floor). Baselines are recorded from CI runs of volume.yml; changing them is a reviewed PR that links the run.",
+  "platforms": {}
+}
