@@ -11,5 +11,6 @@ pub mod corpus;
 pub mod fixtures;
 mod generate;
 mod rng;
+mod synth;
 
 pub use generate::{GeneratedLibrary, LibrarySpec, TestkitError, generate_library};

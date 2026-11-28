@@ -22,7 +22,12 @@ tracing.workspace = true
 [dev-dependencies]
 leoht-testkit.workspace = true
 image.workspace = true
+criterion.workspace = true
 tempfile.workspace = true
+
+[[bench]]
+name = "library"
+harness = false
 
 [lints]
 workspace = true

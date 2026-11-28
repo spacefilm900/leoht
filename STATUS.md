@@ -9,7 +9,7 @@ _Last updated: 2026-11-28 by Leoht Master. Update this file in every PR that mov
 **Phase 1 — scanner and index: in progress** (started 2026-11-28 at Keith's instruction, "Do start"). Work lands as a
 series of PRs, none merged without Keith: (1) scanner, metadata and catalog index (`phase-1/scanner-index`, PR #4);
 (2) thumbnails, the CLI (`docs/cli.md`), the no-network test and the HEIC trial check (`phase-1/thumbs-cli`, stacked on #4);
-(3) volume and performance baselines. File watching (FR-LIB-02) is not done yet. Not every G1 entry criterion was met when Phase 1
+(3) volume tests and performance baselines (`phase-1/volume-perf`, PR #6, stacked on #5). File watching (FR-LIB-02) is not done yet. Not every G1 entry criterion was met when Phase 1
 started (G0a trademark is open; Phase 1 tasks are tracked in PRs rather than separate issues; the nightly `Volume`
 workflow had not yet run on `main`); Keith chose to proceed. Progress notes: `docs/process/narratives/phase-1-scanner-and-index.md`.
 
@@ -17,7 +17,7 @@ workflow had not yet run on `main`); Keith chose to proceed. Progress notes: `do
 | Phase | Scope (from LEOHT_PLAN.md) | State |
 |-------|----------------------------|-------|
 | 0 | Repo structure, data model, ADRs, CI skeleton, test harness, quality standards | **Done** (PRs #1–#3 merged; G0a trademark still open) |
-| 1 | Scanner & index, JPEG/PNG/HEIC/RAW, EXIF, thumbnails, SQLite + watch, CLI demo, volume tests 1k–10k | **In progress** (PR #4 scanner + index and PR #5 thumbnails + CLI open for review) |
+| 1 | Scanner & index, JPEG/PNG/HEIC/RAW, EXIF, thumbnails, SQLite + watch, CLI demo, volume tests 1k–10k | **In progress** (PR #4 scanner + index, PR #5 thumbnails + CLI and PR #6 volume + perf baselines open for review) |
 | 2 | Viewer & grid UI (egui) | Not started |
 | 3 | Non-destructive edit engine | Not started |
 | 4 | Stars, captions, tags, albums, search | Not started |
@@ -63,4 +63,18 @@ workflow had not yet run on `main`); Keith chose to proceed. Progress notes: `do
 * Name may fail trademark clearance → rename cost grows once the repo is public.
 
 ## Metrics (filled in from Phase 1)
-Scan/hash/index timings at 1k and 10k photos from the nightly `Volume` workflow: _none yet_.
+First baselines (`perf/baselines.json`) from `Volume` run [46125712164](https://github.com/spacefilm900/leoht/actions/runs/46125712164),
+2026-11-28, on a **synthetic** library (640×480 JPEGs of about 20 KB; real camera JPEGs are 150–750× larger and RAW files more, so treat
+these as a floor, not a forecast). Milliseconds, macos-15 / ubuntu; every FR-FND-07 budget is met.
+
+| Metric | 1k (budget) | 1k measured | 10k (budget) | 10k measured |
+|---|---:|---:|---:|---:|
+| Cold scan | 5 000 | 413 / 236 | 50 000 | 5 151 / 2 498 |
+| First 500 visible | 2 000 | 295 / 123 | 2 000 | 715 / 143 |
+| Warm start | 1 000 | 2 / 2 | 1 500 | 22 / 17 |
+| Rescan, no changes | 1 000 | 4 / 4 | 5 000 | 100 / 42 |
+| Rebuild | 6 000 | 27 / 21 | 60 000 | 449 / 213 |
+| Thumbnails (informational) | 60 000 | 4 955 / 3 019 | 600 000 | 28 029 / 30 199 |
+
+Peak CLI memory on 10k: scan 8 MB; `list --json` 105 / 116 MB; `thumbs` 248 / 28 MB. Still to do: a real photo folder
+and a slow external disk. Details and caveats: the Phase 1 narrative, "Numbers".
