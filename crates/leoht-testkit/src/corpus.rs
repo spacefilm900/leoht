@@ -166,7 +166,12 @@ pub const UNICODE_NAMES: &[&str] = &[
 pub fn write_unicode_corpus(root: &Utf8Path) -> Result<Vec<String>, TestkitError> {
     let jpg = jpeg(&quadrants(8, 8), None, None)?;
     let pngb = png(&quadrants(8, 8), None, None)?;
-    let mut rels: Vec<String> = UNICODE_NAMES.iter().map(|s| (*s).to_owned()).collect();
+    // Windows forbids control characters (the tab) in names; everything else is portable.
+    let mut rels: Vec<String> = UNICODE_NAMES
+        .iter()
+        .filter(|s| !(cfg!(windows) && s.chars().any(char::is_control)))
+        .map(|s| (*s).to_owned())
+        .collect();
     // Five 80-character folder names: a 400+ character relative path, while
     // each component stays under the common 255-byte name limit.
     let segment = "long-folder-name-".repeat(5);
