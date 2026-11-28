@@ -22,6 +22,9 @@ pub enum CatalogError {
     /// A row named a format this build does not know (catalog from a different version).
     #[error("catalog contains unknown format name {0:?}")]
     UnknownFormat(String),
+    /// A row held a value this build cannot interpret (corrupt or hand-edited database).
+    #[error("catalog contains an invalid value: {0}")]
+    BadValue(String),
     /// A row held a value that is not a valid domain value (corrupt or hand-edited database).
     #[error("catalog contains an invalid value: {0}")]
     Corrupt(#[from] CoreError),

@@ -1,0 +1,26 @@
+[package]
+name = "leoht-library"
+description = "A library on disk: config, cache location, incremental scan into the catalog, rebuild."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+leoht-core.workspace = true
+leoht-catalog.workspace = true
+leoht-scan.workspace = true
+blake3.workspace = true
+camino.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+leoht-testkit.workspace = true
+tempfile.workspace = true
+
+[lints]
+workspace = true

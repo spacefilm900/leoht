@@ -5,3 +5,4 @@ phase exit checklist. They are the public case study of building Leoht with agen
 and what the humans decided.
 
 * [phase-0-scaffold.md](phase-0-scaffold.md) — stub, completed at the Phase 0 exit.
+* [phase-1-scanner-and-index.md](phase-1-scanner-and-index.md) — progress note, updated with each Phase 1 PR.

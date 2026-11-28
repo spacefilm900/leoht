@@ -747,15 +747,34 @@ dependencies = [
 name = "leoht-it"
 version = "0.0.0"
 dependencies = [
+ "blake3",
  "camino",
  "image",
+ "insta",
  "leoht-catalog",
  "leoht-core",
  "leoht-edit",
+ "leoht-library",
  "leoht-scan",
  "leoht-testkit",
  "leoht-thumb",
+ "serde_json",
  "tempfile",
+]
+
+[[package]]
+name = "leoht-library"
+version = "0.0.0"
+dependencies = [
+ "blake3",
+ "camino",
+ "leoht-catalog",
+ "leoht-core",
+ "leoht-scan",
+ "leoht-testkit",
+ "tempfile",
+ "thiserror",
+ "tracing",
 ]
 
 [[package]]
@@ -766,10 +785,14 @@ dependencies = [
  "camino",
  "criterion",
  "ignore",
+ "image",
  "kamadak-exif",
  "leoht-core",
  "leoht-testkit",
  "notify",
+ "proptest",
+ "serde",
+ "serde_json",
  "tempfile",
  "thiserror",
  "tracing",
@@ -782,6 +805,7 @@ dependencies = [
  "blake3",
  "camino",
  "image",
+ "kamadak-exif",
  "tempfile",
  "thiserror",
 ]

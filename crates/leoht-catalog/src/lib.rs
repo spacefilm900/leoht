@@ -10,8 +10,9 @@
 
 mod error;
 mod migrations;
+mod row;
 mod store;
 
 pub use error::CatalogError;
 pub use migrations::SCHEMA_VERSION;
-pub use store::Catalog;
+pub use store::{Catalog, FileState};

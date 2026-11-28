@@ -53,6 +53,9 @@ pub enum TestkitError {
     /// Image encoding failure.
     #[error("cannot encode synthetic image: {0}")]
     Encode(#[from] image::ImageError),
+    /// EXIF block could not be written.
+    #[error("cannot write synthetic EXIF: {0}")]
+    Exif(String),
     /// `photos_per_folder` was zero.
     #[error("photos_per_folder must be at least 1")]
     EmptyFolders,
@@ -64,8 +67,9 @@ const SIZE: u32 = 16;
 /// Generates `spec.count` files under `root`, laid out as
 /// `year-NNNN/folder-NNNNN/IMG_NNNNNN.<ext>`.
 ///
-/// Mix: ~80% JPEG, ~10% PNG, ~5% fake HEIC and ~5% fake RAW (placeholder bytes: the
-/// scanner only needs to *detect* those, and Phase 0 has no decoder for them).
+/// Mix: ~80% JPEG, ~10% PNG, ~5% HEIC and ~5% RAW. The HEIC and RAW files are
+/// placeholders with a valid signature followed by noise: the scanner only
+/// *detects* those formats in Phase 1 (ADR-0004), so their pixels never matter.
 ///
 /// # Errors
 /// Filesystem or encoding failure, `photos_per_folder == 0`, or a target file that already
@@ -87,8 +91,8 @@ pub fn generate_library(
         let (ext, bytes) = match rng.next_u64() % 20 {
             0..=15 => ("jpg", encode_jpeg(&mut rng)?),
             16..=17 => ("png", encode_png(&mut rng)?),
-            18 => ("heic", placeholder(&mut rng)),
-            _ => ("cr2", placeholder(&mut rng)),
+            18 => ("heic", placeholder(HEIC_MAGIC, &mut rng)),
+            _ => ("cr2", placeholder(CR2_MAGIC, &mut rng)),
         };
         fs::create_dir_all(&dir).map_err(|source| TestkitError::Io {
             path: dir.clone(),
@@ -152,9 +156,17 @@ fn encode_png(rng: &mut SplitMix64) -> Result<Vec<u8>, TestkitError> {
     Ok(out)
 }
 
-/// 64 bytes of seeded noise standing in for an undecodable HEIC/RAW file.
-fn placeholder(rng: &mut SplitMix64) -> Vec<u8> {
-    (0..8).flat_map(|_| rng.next_u64().to_le_bytes()).collect()
+/// An ISOBMFF `ftyp` box with HEIC brands: what makes a file detectable as HEIC.
+const HEIC_MAGIC: &[u8] = b"\0\0\0\x18ftypheic\0\0\0\0mif1heic";
+/// A little-endian TIFF header with the `CR` marker Canon CR2 files carry.
+const CR2_MAGIC: &[u8] = b"II*\0\x10\0\0\0CR\x02\0";
+
+/// A valid signature followed by 64 bytes of seeded noise, standing in for an
+/// undecodable HEIC/RAW file.
+fn placeholder(magic: &[u8], rng: &mut SplitMix64) -> Vec<u8> {
+    let mut out = magic.to_vec();
+    out.extend((0..8).flat_map(|_| rng.next_u64().to_le_bytes()));
+    out
 }
 
 #[cfg(test)]

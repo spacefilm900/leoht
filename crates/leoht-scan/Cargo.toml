@@ -1,6 +1,6 @@
 [package]
 name = "leoht-scan"
-description = "Folder walking, format detection, content hashing, EXIF and (optionally) fs watching."
+description = "Folder walking, format detection, metadata probing, content hashing and (optionally) fs watching."
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -10,9 +10,7 @@ repository.workspace = true
 publish.workspace = true
 
 [features]
-default = ["exif"]
-# Read EXIF capture time etc. (pure Rust, small).
-exif = ["dep:kamadak-exif"]
+default = []
 # Live filesystem watching. Off by default: heavier dependency tree, platform
 # backends (FSEvents on macOS, inotify on Linux). Phase 1 turns this on.
 watch = ["dep:notify"]
@@ -22,14 +20,18 @@ leoht-core.workspace = true
 blake3.workspace = true
 camino.workspace = true
 ignore.workspace = true
+image.workspace = true
+kamadak-exif.workspace = true
+serde.workspace = true
+serde_json.workspace = true
 thiserror.workspace = true
 tracing.workspace = true
-kamadak-exif = { workspace = true, optional = true }
 notify = { workspace = true, optional = true }
 
 [dev-dependencies]
 criterion.workspace = true
 leoht-testkit.workspace = true
+proptest.workspace = true
 tempfile.workspace = true
 
 [[bench]]

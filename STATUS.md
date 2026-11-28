@@ -1,16 +1,22 @@
 # Leoht status
 
-_Last updated: 2026-11-27 by Leoht Master. Update this file in every PR that moves a gate._
+_Last updated: 2026-11-28 by Leoht Master. Update this file in every PR that moves a gate._
 
 ## Now
 **Phase 0 — scaffold.** The public repo `spacefilm900/leoht` exists and the scaffold PR #1 is merged to `main` (2026-11-27). CI is green on macOS (`macos-15`, Apple Silicon), Linux and
 (non-blocking) Windows; CodeRabbit has reviewed. The clean-room Picasa feature inventory (`docs/research/`) and the early-feature-trial gate (Gt) are merged (PR #2). The functional specification (`docs/spec/functional-spec.md`, 107 requirements) was reviewed by Keith on 2026-11-27 (PR #3) and his decisions are applied.
 
+**Phase 1 — scanner and index: in progress** (started 2026-11-28 at Keith's instruction, "Do start"). Work lands as a
+series of PRs, none merged without Keith: (1) scanner, metadata and catalog index (`phase-1/scanner-index`);
+(2) thumbnails and the CLI; (3) volume and performance baselines. Not every G1 entry criterion was met when Phase 1
+started (G0a trademark is open; Phase 1 tasks are tracked in PRs rather than separate issues; the nightly `Volume`
+workflow had not yet run on `main`); Keith chose to proceed. Progress notes: `docs/process/narratives/phase-1-scanner-and-index.md`.
+
 ## Phases
 | Phase | Scope (from LEOHT_PLAN.md) | State |
 |-------|----------------------------|-------|
-| 0 | Repo structure, data model, ADRs, CI skeleton, test harness, quality standards | **In progress** (scaffold built locally; awaiting human gates) |
-| 1 | Scanner & index, JPEG/PNG/HEIC/RAW, EXIF, thumbnails, SQLite + watch, CLI demo, volume tests 1k–10k | Not started |
+| 0 | Repo structure, data model, ADRs, CI skeleton, test harness, quality standards | **Done** (PRs #1–#3 merged; G0a trademark still open) |
+| 1 | Scanner & index, JPEG/PNG/HEIC/RAW, EXIF, thumbnails, SQLite + watch, CLI demo, volume tests 1k–10k | **In progress** (scanner + index PR open for review) |
 | 2 | Viewer & grid UI (egui) | Not started |
 | 3 | Non-destructive edit engine | Not started |
 | 4 | Stars, captions, tags, albums, search | Not started |
@@ -40,6 +46,8 @@ _Last updated: 2026-11-27 by Leoht Master. Update this file in every PR that mov
 | Legal review of HEVC patent exposure before distributing binaries that decode HEIC | Open (needed before any release, not before dev) |
 
 ## Open questions
+* ADR-0006 (library layout and scanning rules: cache outside the library, `leoht-library.json`, hidden files and symlinks skipped) is **Proposed**; needs Keith's approval (Gx-arch).
+* HEIC metadata is tested only on a generated metadata-only HEIF; real iPhone HEIC files (Keith's samples) are needed to confirm. CR3 is detection-only in Phase 1.
 * HEIC decoder: `heifer` vs `heic-rs` (Phase 1 spike; ADR-0004).
 * RAW approach given LGPL-2.1 Rust RAW crates and LibRaw's LGPL-2.1-or-CDDL-1.0 licence (ADR-0004, ADR-0005).
 * Commercial HEIC path: Apple system frameworks behind a `heic-system` feature vs the pure-Rust decoder (ADR-0005; include in the Phase 1 spike).

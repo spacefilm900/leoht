@@ -26,15 +26,35 @@ path = "golden.rs"
 name = "volume"
 path = "volume.rs"
 
+[[test]]
+name = "scan_corpus"
+path = "scan_corpus.rs"
+
+[[test]]
+name = "library_rules"
+path = "library_rules.rs"
+
+[[test]]
+name = "originals"
+path = "originals.rs"
+
+[[test]]
+name = "unicode_paths"
+path = "unicode_paths.rs"
+
 [dev-dependencies]
 leoht-core.workspace = true
 leoht-catalog.workspace = true
 leoht-scan.workspace = true
 leoht-edit.workspace = true
 leoht-thumb.workspace = true
+leoht-library.workspace = true
 leoht-testkit.workspace = true
+blake3.workspace = true
 camino.workspace = true
 image.workspace = true
+insta.workspace = true
+serde_json.workspace = true
 tempfile.workspace = true
 
 [lints]
