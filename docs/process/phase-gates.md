@@ -15,13 +15,14 @@ issues labelled `human-gate`. Chat messages are not the record; issues and PRs a
 | Gx-ux UX review | From Phase 2 (viewer/grid) onwards, and before Mac polish (Phase 5) | Keith |
 | Gx-privacy Legal/privacy review | Before face recognition or any sharing/export feature (Phase 6+) | Keith |
 | G0a Trademark / name clearance | Before the public repo is created or named | Keith (USPTO, EUIPO, domains, common-law searches; possibly counsel) |
-| G0b Create public repo, enable CodeRabbit, branch protection | Normally after G0a. **Approved exception:** Keith approved creating the public repo on 2026-11-26 while G0a is still open (not a clearance; the name may change). Still open: branch protection requiring `CI OK` | Keith (Master prepares the exact steps) |
+| G0b Create public repo, enable CodeRabbit, branch protection | Normally after G0a. **Approved exception:** Keith approved creating the public repo on 2026-11-26 while G0a is still open (not a clearance; the name may change). Branch protection requiring `CI OK` is now set on `main` (checked 2026-11-27) | Keith (Master prepares the exact steps) |
 | G0c ADR approval | Before Phase 1 starts | Keith approves ADR-0001…0005 |
 | G1 Phase 1 entry | After scaffold CI is green on `main` | The criteria listed under "Phase 1 entry criteria" below |
 | G1x Phase 1 exit | CLI demo + 1k/10k volume baselines recorded | Keith |
 | G-commercial Commercial release readiness | Before any paid build, App Store listing or paid marketing | Trademark cleared; IP-lawyer review (ADR-0005); CLA in place; Appendix A reviewed |
 | G-legal HEIC/HEVC patent review | Before distributing any binary that decodes HEIC | Keith / counsel |
 | Gt Early feature trial | For each feature group, **before** it is polished: a rough trial build that Keith tries hands-on on his Apple Silicon Mac (see "Early feature trials" below) | Keith's trial sign-off recorded on the trial issue; the trial meets the ease-of-trial requirement |
+| G-import Picasa metadata importer | Before any work on the read-only Picasa importer (Keith decided 2026-11-27: Phase 6 or later, read-only, gated on a legal review) | A completed clean-room and legal review, recorded and approved by Keith |
 | Gf Focused-core quality bar | Before any new feature area or scope widening beyond organise, view, crop and adjust (Core Principle 6) | Keith confirms the focused core meets its quality bar |
 | Gn Phase N exit | Each phase | Keith reviews narrative, tests and demo |
 

@@ -8,7 +8,7 @@ A modern, **folder-first**, **non-destructive** photo organiser and light editor
 Google Picasa. Mac first, then Linux and Windows. Your folders are the source of truth; edits live in small
 `.leoht.json` sidecars next to your photos; the database is only a disposable index.
 
-* Plan: [LEOHT_PLAN.md](LEOHT_PLAN.md) · Status: [STATUS.md](STATUS.md) · Decisions: [docs/adr](docs/adr) · Process: [docs/process](docs/process)
+* Plan: [LEOHT_PLAN.md](LEOHT_PLAN.md) · Status: [STATUS.md](STATUS.md) · Decisions: [docs/adr](docs/adr) · Process: [docs/process](docs/process) · Spec (draft): [docs/spec](docs/spec/functional-spec.md) · Research: [docs/research](docs/research)
 * Legal: fully clean-room, see [CLEAN_ROOM.md](CLEAN_ROOM.md). Licence: [MIT](LICENSE).
 
 ## Workspace
