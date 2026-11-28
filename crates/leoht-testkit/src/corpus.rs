@@ -8,6 +8,7 @@
 //! are reproducible.
 
 use std::fs::{self, File};
+use std::io::Write as _;
 use std::time::{Duration, SystemTime};
 
 use camino::Utf8Path;
@@ -50,13 +51,16 @@ fn write(root: &Utf8Path, rel: &str, bytes: &[u8]) -> Result<(), TestkitError> {
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent).map_err(io)?;
     }
-    fs::write(&path, bytes).map_err(io)?;
+    // `create_new`: never truncate an existing file (or follow a symlink to
+    // one); a populated destination is an error, and the file is untouched.
     let mtime = SystemTime::UNIX_EPOCH + Duration::from_secs(CORPUS_MTIME_SECS);
-    File::options()
+    let mut file = File::options()
         .write(true)
+        .create_new(true)
         .open(&path)
-        .and_then(|f| f.set_modified(mtime))
-        .map_err(io)
+        .map_err(io)?;
+    file.write_all(bytes).map_err(io)?;
+    file.set_modified(mtime).map_err(io)
 }
 
 /// Writes the metadata and damage corpus under `root` and returns the relative

@@ -9,6 +9,8 @@ use std::fmt;
 
 use serde::{Deserialize, Serialize};
 
+use crate::CoreError;
+
 use crate::Orientation;
 
 /// Where a photo's capture time came from.
@@ -37,15 +39,51 @@ pub struct CaptureTime {
 }
 
 /// An unsigned EXIF rational such as an exposure time of `1/125` s.
+///
+/// The denominator is never zero: [`Ratio::new`], [`Ratio::parse`] and
+/// deserialisation all reject it, so [`Ratio::as_f64`] is always finite and
+/// [`fmt::Display`] output always parses back.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(try_from = "RawRatio")]
 pub struct Ratio {
-    /// Numerator.
-    pub num: u32,
-    /// Denominator (never zero: a zero denominator is dropped when reading).
-    pub den: u32,
+    num: u32,
+    den: u32,
+}
+
+/// The serialised shape of a [`Ratio`], validated on the way in.
+#[derive(Deserialize)]
+struct RawRatio {
+    num: u32,
+    den: u32,
+}
+
+impl TryFrom<RawRatio> for Ratio {
+    type Error = CoreError;
+
+    fn try_from(raw: RawRatio) -> Result<Self, Self::Error> {
+        Self::new(raw.num, raw.den).ok_or(CoreError::ZeroDenominator)
+    }
 }
 
 impl Ratio {
+    /// `num/den`, or `None` if `den` is zero.
+    #[must_use]
+    pub fn new(num: u32, den: u32) -> Option<Self> {
+        (den != 0).then_some(Self { num, den })
+    }
+
+    /// The numerator.
+    #[must_use]
+    pub fn num(self) -> u32 {
+        self.num
+    }
+
+    /// The denominator (never zero).
+    #[must_use]
+    pub fn den(self) -> u32 {
+        self.den
+    }
+
     /// The value as a float, for display and sorting.
     #[must_use]
     pub fn as_f64(self) -> f64 {
@@ -56,8 +94,7 @@ impl Ratio {
     #[must_use]
     pub fn parse(text: &str) -> Option<Self> {
         let (num, den) = text.split_once('/')?;
-        let (num, den) = (num.parse().ok()?, den.parse().ok()?);
-        (den != 0).then_some(Self { num, den })
+        Self::new(num.parse().ok()?, den.parse().ok()?)
     }
 }
 
@@ -125,6 +162,18 @@ pub struct PhotoMeta {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_zero_denominator_is_rejected_everywhere() {
+        assert_eq!(Ratio::new(1, 0), None);
+        assert_eq!(Ratio::parse("1/0"), None);
+        assert!(serde_json::from_str::<Ratio>(r#"{"num":1,"den":0}"#).is_err());
+        let r: Ratio = serde_json::from_str(r#"{"num":1,"den":125}"#).unwrap();
+        assert_eq!(
+            (r.num(), r.den(), r.to_string()),
+            (1, 125, "1/125".to_owned())
+        );
+    }
 
     #[test]
     fn ratio_display_and_parse_round_trip() {

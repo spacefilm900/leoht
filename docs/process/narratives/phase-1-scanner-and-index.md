@@ -51,6 +51,14 @@ fake a pass").
 * A first draft of a test helper used a home-made checksum "to avoid a dependency" with a misleading name; replaced with
   BLAKE3 before commit. Small, but exactly the kind of shortcut review should catch.
 
+* CodeRabbit's review of the scanner PR found 15 issues, most of them real: impossible dates (31 April, 29 February
+  2023) and out-of-range zone offsets were accepted; a rescan would have deleted the catalog rows of a folder that was
+  only temporarily unreadable; a failed rebuild left the library writing to a throwaway in-memory database; the
+  "cache inside the library" refusal created folders before refusing; ORF and RW2 files lost their metadata because the
+  EXIF reader rejects their private TIFF magic numbers; the JPEG frame header and ICC chunk loop were not fully bounded;
+  a PNG `sRGB` chunk was ignored. All fixed with tests. Lesson: the hostile-input property tests found none of these,
+  because they are about *plausible* inputs handled wrongly, not malformed ones.
+
 ## Numbers
 _Filled in as PRs land: test counts by level, CI duration, and the 1k/10k measurements against FR-FND-07._
 

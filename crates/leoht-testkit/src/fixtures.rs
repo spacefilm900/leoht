@@ -128,6 +128,14 @@ impl ExifSpec {
 /// # Errors
 /// [`TestkitError::Exif`] if the writer rejects the fields (for example none at all).
 pub fn exif_tiff(spec: &ExifSpec) -> Result<Vec<u8>, TestkitError> {
+    exif_tiff_ordered(spec, false)
+}
+
+/// As [`exif_tiff`], little-endian (`II`) when `little_endian` is true.
+///
+/// # Errors
+/// As [`exif_tiff`].
+pub fn exif_tiff_ordered(spec: &ExifSpec, little_endian: bool) -> Result<Vec<u8>, TestkitError> {
     let fields = spec.fields();
     let mut writer = Writer::new();
     for field in &fields {
@@ -145,7 +153,7 @@ pub fn exif_tiff(spec: &ExifSpec) -> Result<Vec<u8>, TestkitError> {
     }
     let mut out = Cursor::new(Vec::new());
     writer
-        .write(&mut out, false)
+        .write(&mut out, little_endian)
         .map_err(|e| TestkitError::Exif(e.to_string()))?;
     Ok(out.into_inner())
 }

@@ -96,10 +96,13 @@ fn probe_into(
         if let Some((w, h)) = info.size {
             (meta.width, meta.height) = (Some(w), Some(h));
         }
+        // An embedded profile is authoritative; a bare sRGB declaration is next.
         if let Some(icc) = info.icc {
             meta.color = ColorInfo::Icc {
                 description: icc::description(&icc),
             };
+        } else if info.srgb {
+            meta.color = ColorInfo::Srgb;
         }
     }
     check_size(meta)

@@ -85,4 +85,35 @@ pub fn set_tree_readonly(root: &Utf8Path, readonly: bool) {
         perms.set_readonly(readonly);
         std::fs::set_permissions(p, perms).expect("chmod");
     }
+    // On Windows the read-only attribute does not stop changes to a folder's
+    // contents, so deny write, delete and add-file rights to Everyone with an
+    // inherited access-control entry (and remove it again afterwards).
+    #[cfg(windows)]
+    {
+        let args: &[&str] = if readonly {
+            &["/deny", "*S-1-1-0:(OI)(CI)(W,D,DC)"]
+        } else {
+            &["/remove:d", "*S-1-1-0", "/T", "/C"]
+        };
+        let status = std::process::Command::new("icacls")
+            .arg(root.as_str())
+            .args(args)
+            .arg("/Q")
+            .status()
+            .expect("run icacls");
+        assert!(status.success(), "icacls {args:?} failed");
+    }
+}
+
+/// True if creating a file directly in `dir` fails, i.e. the folder really is
+/// write-protected. A probe file that does get created is removed again.
+pub fn folder_rejects_writes(dir: &Utf8Path) -> bool {
+    let probe = dir.join(".leoht-write-probe");
+    match std::fs::File::create(&probe) {
+        Ok(_) => {
+            let _ = std::fs::remove_file(&probe);
+            false
+        }
+        Err(_) => true,
+    }
 }

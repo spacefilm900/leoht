@@ -2,6 +2,8 @@
 
 use serde::{Deserialize, Serialize};
 
+use crate::CoreError;
+
 /// The eight EXIF orientation values (TIFF tag 0x0112), as defined by the EXIF
 /// standard. Value 1 means "stored upright"; the others combine a rotation and
 /// an optional mirror. Anything outside 1..=8 in a file is treated as 1.
@@ -53,10 +55,10 @@ impl Default for Orientation {
 }
 
 impl TryFrom<u8> for Orientation {
-    type Error = String;
+    type Error = CoreError;
 
     fn try_from(value: u8) -> Result<Self, Self::Error> {
-        Self::from_exif(u32::from(value)).ok_or_else(|| format!("orientation {value} not in 1..=8"))
+        Self::from_exif(u32::from(value)).ok_or(CoreError::InvalidOrientation(value))
     }
 }
 

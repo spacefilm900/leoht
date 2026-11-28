@@ -12,7 +12,7 @@
 mod common;
 
 use camino::Utf8Path;
-use common::{TempLibrary, set_tree_readonly, tree_fingerprint};
+use common::{TempLibrary, folder_rejects_writes, set_tree_readonly, tree_fingerprint};
 use leoht_library::Library;
 use leoht_testkit::corpus::{write_metadata_corpus, write_unicode_corpus};
 use leoht_testkit::{LibrarySpec, generate_library};
@@ -79,6 +79,13 @@ fn operations_work_on_a_fully_read_only_library() {
         let cache = TempLibrary::new();
         let before = tree_fingerprint(&lib.root);
         set_tree_readonly(&lib.root, true);
+        let protected = folder_rejects_writes(&lib.root);
+        if !protected {
+            set_tree_readonly(&lib.root, false);
+        }
+        // Running as root (or a filesystem ignoring permissions) would make
+        // this test vacuous: fail loudly rather than pass.
+        assert!(protected, "could not write-protect the library folder");
         let outcome = std::panic::catch_unwind(|| op(&lib.root, &cache.root));
         set_tree_readonly(&lib.root, false); // so the temp dir can be deleted
         assert!(

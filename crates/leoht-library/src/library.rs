@@ -73,7 +73,13 @@ impl Library {
             match fs::remove_file(&path) {
                 Ok(()) => {}
                 Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
-                Err(source) => return Err(LibraryError::Cache { path, source }),
+                Err(source) => {
+                    // Never leave the throwaway in-memory catalog in place: later
+                    // scans would "succeed" into memory and be lost. Reconnect to
+                    // the database on disk (whatever is left of it) first.
+                    self.catalog = Catalog::open(&self.paths.catalog)?;
+                    return Err(LibraryError::Cache { path, source });
+                }
             }
         }
         self.catalog = Catalog::open(&self.paths.catalog)?;
@@ -91,13 +97,22 @@ fn resolve_paths(
     let root = canonical(root)?;
     let cache_root = cache::cache_root(cache_root).ok_or(LibraryError::NoCacheDir)?;
     let cache_dir = cache::library_cache_dir(&cache_root, &root);
+    // Check before creating anything: a cache inside the library must not
+    // leave even an empty folder behind.
+    let planned = resolve_planned(&cache_dir)?;
+    if planned.starts_with(&root) {
+        return Err(LibraryError::CacheInsideLibrary {
+            cache: planned,
+            library: root,
+        });
+    }
     fs::create_dir_all(&cache_dir).map_err(|source| LibraryError::Cache {
         path: cache_dir.clone(),
         source,
     })?;
     let cache_dir = canonical(&cache_dir)?;
     if cache_dir.starts_with(&root) {
-        // Clean up the folder we just made: it must not stay inside the library.
+        // Only reachable through a symlink created in the meantime; clean up.
         let _ = fs::remove_dir(&cache_dir);
         return Err(LibraryError::CacheInsideLibrary {
             cache: cache_dir,
@@ -120,6 +135,32 @@ fn resolve_paths(
         cache_dir,
         root,
     })
+}
+
+/// Where `path` will be once created: its nearest existing ancestor,
+/// canonicalised (so symlinks and `..` are resolved), plus the parts that do
+/// not exist yet.
+fn resolve_planned(path: &Utf8Path) -> Result<Utf8PathBuf, LibraryError> {
+    let absolute = std::path::absolute(path).map_err(|source| LibraryError::Cache {
+        path: path.to_owned(),
+        source,
+    })?;
+    let absolute = Utf8PathBuf::from_path_buf(absolute).map_err(|p| LibraryError::Cache {
+        path: path.to_owned(),
+        source: std::io::Error::other(format!("path is not valid UTF-8: {}", p.display())),
+    })?;
+    let mut missing = Vec::new();
+    let mut existing = absolute.as_path();
+    while !existing.exists() {
+        let (Some(parent), Some(name)) = (existing.parent(), existing.file_name()) else {
+            break;
+        };
+        missing.push(name);
+        existing = parent;
+    }
+    let mut planned = canonical(existing)?;
+    planned.extend(missing.iter().rev());
+    Ok(planned)
 }
 
 fn canonical(path: &Utf8Path) -> Result<Utf8PathBuf, LibraryError> {

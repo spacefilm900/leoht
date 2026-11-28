@@ -43,8 +43,13 @@ pub enum SkipReason {
 /// An entry the walk passed over, with the reason.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Skipped {
-    /// The path as far as it could be displayed (lossy for non-UTF-8 names).
+    /// The path for display, without loss: UTF-8 paths verbatim, others in
+    /// Rust's quoted, escaped form (`"caf\xE9.jpg"`), so distinct names stay distinct.
     pub path: String,
+    /// The entry's path when it is known and valid UTF-8. A rescan uses it to
+    /// keep catalog rows under an unreadable folder instead of treating them
+    /// as deleted.
+    pub abs: Option<Utf8PathBuf>,
     /// Why it was skipped.
     pub reason: SkipReason,
 }
@@ -85,9 +90,10 @@ pub fn walk_library(
         let entry = match entry {
             Ok(entry) => entry,
             Err(e) => {
-                let path = e.to_string();
+                let native = error_path(&e);
                 skipped.push(Skipped {
-                    path,
+                    path: native.map_or_else(|| e.to_string(), display_path),
+                    abs: native.and_then(|p| Utf8PathBuf::from_path_buf(p.to_path_buf()).ok()),
                     reason: SkipReason::Unreadable(e.to_string()),
                 });
                 continue;
@@ -114,8 +120,30 @@ pub fn walk_library(
 
 fn skip(entry: &ignore::DirEntry, reason: SkipReason) -> Skipped {
     Skipped {
-        path: entry.path().to_string_lossy().into_owned(),
+        path: display_path(entry.path()),
+        abs: Utf8PathBuf::from_path_buf(entry.path().to_path_buf()).ok(),
         reason,
+    }
+}
+
+/// A path as text without loss (see [`Skipped::path`]).
+// `Debug` is deliberate for non-UTF-8 paths: it escapes the invalid bytes
+// instead of replacing them, so two different names never look the same.
+#[allow(clippy::unnecessary_debug_formatting)]
+fn display_path(path: &std::path::Path) -> String {
+    path.to_str()
+        .map_or_else(|| format!("{path:?}"), str::to_owned)
+}
+
+/// The path a walk error is about, if it names one.
+fn error_path(e: &ignore::Error) -> Option<&std::path::Path> {
+    match e {
+        ignore::Error::WithPath { path, .. } => Some(path),
+        ignore::Error::WithDepth { err, .. } | ignore::Error::WithLineNumber { err, .. } => {
+            error_path(err)
+        }
+        ignore::Error::Loop { child, .. } => Some(child),
+        _ => None,
     }
 }
 

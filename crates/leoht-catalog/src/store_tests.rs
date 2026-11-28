@@ -26,10 +26,10 @@ fn rich_photo() -> Photo {
     p.meta.camera_make = Some("Maker".into());
     p.meta.camera_model = Some("Model X".into());
     p.meta.lens_model = Some("24-70mm".into());
-    p.meta.exposure.exposure_time = Some(Ratio { num: 1, den: 250 });
-    p.meta.exposure.f_number = Some(Ratio { num: 28, den: 10 });
+    p.meta.exposure.exposure_time = Some(Ratio::new(1, 250).unwrap());
+    p.meta.exposure.f_number = Some(Ratio::new(28, 10).unwrap());
     p.meta.exposure.iso = Some(400);
-    p.meta.exposure.focal_length_mm = Some(Ratio { num: 50, den: 1 });
+    p.meta.exposure.focal_length_mm = Some(Ratio::new(50, 1).unwrap());
     p.meta.width = Some(4032);
     p.meta.height = Some(3024);
     p.meta.orientation = Orientation::from_exif(6).unwrap();

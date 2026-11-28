@@ -40,7 +40,12 @@ const SIGNATURES: &[(&str, &[u8])] = &[
 ];
 
 proptest! {
-    #![proptest_config(ProptestConfig::with_cases(64))]
+    // Fixed seed: CI runs are reproducible and a failure seen once is seen
+    // again. To explore new inputs locally, change the seed.
+    #![proptest_config(ProptestConfig {
+        rng_seed: proptest::test_runner::RngSeed::Fixed(0x1E0F_7A11),
+        ..ProptestConfig::with_cases(64)
+    })]
 
     #[test]
     fn random_bytes_behind_a_signature_never_panic(

@@ -27,6 +27,16 @@ pub fn read_exif(file: &mut File, head: &[u8]) -> Option<Exif> {
     reader.continue_on_error(true);
     let result = if is_tiff(head) {
         read_tiff_prefix(file).and_then(|buf| reader.read_raw(buf).map_err(Some))
+    } else if let Some(magic) = tiff_variant_magic(head) {
+        // Olympus ORF and Panasonic RW2 are TIFF with a private magic number
+        // that kamadak-exif rejects; the IFD layout after it is standard TIFF.
+        read_tiff_prefix(file).and_then(|mut buf| {
+            let Some(slot) = buf.get_mut(2..4) else {
+                return Err(None);
+            };
+            slot.copy_from_slice(&magic);
+            reader.read_raw(buf).map_err(Some)
+        })
     } else if head.starts_with(b"FUJIFILMCCD-RAW") {
         read_raf_preview(file, head).and_then(|jpeg| {
             reader
@@ -51,6 +61,17 @@ pub fn read_exif(file: &mut File, head: &[u8]) -> Option<Exif> {
             })
             .ok(),
         Err(None) => None,
+    }
+}
+
+/// For TIFF-structured RAW files with a non-standard magic number (Olympus
+/// ORF `IIRO`/`IIRS`/`MMOR`, Panasonic RW2 `IIU\0`), the standard TIFF magic
+/// in the file's byte order, to substitute before parsing.
+fn tiff_variant_magic(head: &[u8]) -> Option<[u8; 2]> {
+    match head.get(..4)? {
+        b"IIRO" | b"IIRS" | b"IIU\0" => Some([0x2A, 0x00]),
+        b"MMOR" => Some([0x00, 0x2A]),
+        _ => None,
     }
 }
 

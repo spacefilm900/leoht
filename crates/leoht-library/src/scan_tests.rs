@@ -134,8 +134,8 @@ fn cache_inside_the_library_is_refused_and_nothing_is_left_behind() {
         matches!(err, LibraryError::CacheInsideLibrary { .. }),
         "{err}"
     );
-    // Only the empty parent folders may remain; no catalog was created.
-    assert!(!inside.join("libraries").read_dir().unwrap().any(|_| true));
+    // Checked before anything is created: not even an empty folder is left.
+    assert!(!inside.exists());
 }
 
 #[test]
@@ -149,4 +149,62 @@ fn cache_folder_says_which_library_it_belongs_to() {
             .cache_dir
             .starts_with(fs::canonicalize(&f.cache).unwrap())
     );
+}
+
+/// A folder that cannot be read during a rescan keeps its catalog rows
+/// (FR-LIB-09 reconciliation must not mistake "unreadable" for "deleted").
+#[cfg(unix)]
+#[test]
+fn rows_under_an_unreadable_folder_are_kept() {
+    use std::os::unix::fs::PermissionsExt;
+    let f = fixture(30);
+    let mut lib = Library::open(&f.root, Some(&f.cache)).unwrap();
+    lib.scan(|_| {}).unwrap();
+    let folder = f.root.join("year-2001/folder-00001");
+    fs::set_permissions(&folder, fs::Permissions::from_mode(0o000)).unwrap();
+    let readable = fs::read_dir(&folder).is_ok(); // true when running as root
+    let rescan = lib.scan(|_| {}).unwrap();
+    fs::set_permissions(&folder, fs::Permissions::from_mode(0o755)).unwrap();
+    if readable {
+        return; // permissions are not enforced for this user; nothing to test
+    }
+    assert_eq!(rescan.removed, 0, "{rescan:?}");
+    assert_eq!(lib.catalog().photo_count().unwrap(), 30);
+    assert!(
+        rescan
+            .skipped
+            .iter()
+            .any(|s| matches!(s.reason, leoht_scan::SkipReason::Unreadable(_))),
+        "{:?}",
+        rescan.skipped
+    );
+    // Once readable again, a complete scan still removes files that really went away.
+    fs::remove_file(folder.join("IMG_000010.jpg")).ok();
+    let gone = fs::read_dir(&folder).unwrap().count();
+    let after = lib.scan(|_| {}).unwrap();
+    assert_eq!(after.removed, 10 - gone);
+}
+
+/// If the old database cannot be deleted, the library must stay connected to
+/// the database on disk, not to the temporary in-memory one.
+#[cfg(unix)]
+#[test]
+fn failed_rebuild_keeps_the_library_on_disk() {
+    use std::os::unix::fs::PermissionsExt;
+    let f = fixture(10);
+    let mut lib = Library::open(&f.root, Some(&f.cache)).unwrap();
+    lib.scan(|_| {}).unwrap();
+    let dir = lib.paths().cache_dir.clone();
+    fs::set_permissions(&dir, fs::Permissions::from_mode(0o555)).unwrap();
+    let result = lib.rebuild(|_| {});
+    fs::set_permissions(&dir, fs::Permissions::from_mode(0o755)).unwrap();
+    if result.is_ok() {
+        return; // permissions not enforced for this user (root); nothing to test
+    }
+    // The connection is the on-disk catalog: a scan's work survives reopening.
+    fs::write(f.root.join("year-2000/folder-00000/new.png"), b"x").unwrap();
+    lib.scan(|_| {}).unwrap();
+    drop(lib);
+    let reopened = Library::open(&f.root, Some(&f.cache)).unwrap();
+    assert_eq!(reopened.catalog().photo_count().unwrap(), 11);
 }

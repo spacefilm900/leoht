@@ -2,8 +2,9 @@
 
 use std::time::{Duration, Instant};
 
-use leoht_core::Photo;
-use leoht_scan::{LibraryConfig, PROBE_VERSION, Skipped, probe_file, walk_library};
+use camino::Utf8Path;
+use leoht_core::{Photo, RelPath};
+use leoht_scan::{LibraryConfig, PROBE_VERSION, SkipReason, Skipped, probe_file, walk_library};
 
 use crate::{Library, LibraryError};
 
@@ -114,7 +115,14 @@ impl Library {
             committed: summary.probed,
         });
 
-        let gone: Vec<_> = known.into_keys().collect();
+        // Rows under an entry the walk could not read are not "gone": the
+        // folder may be briefly unreadable (permissions, a sleeping disk).
+        // Keep them; a later complete scan reconciles them.
+        let protected = unreadable_prefixes(&self.paths.root, &skipped);
+        let gone: Vec<_> = known
+            .into_keys()
+            .filter(|rel| !is_protected(rel, protected.as_deref()))
+            .collect();
         self.catalog.remove_photos(&gone)?;
         self.catalog
             .set_info(PROBE_VERSION_KEY, &PROBE_VERSION.to_string())?;
@@ -142,6 +150,37 @@ impl Library {
         self.reset_catalog()?;
         self.scan(progress)
     }
+}
+
+/// Library-relative prefixes of entries the walk could not read. `None` means
+/// an unreadable entry with no usable path: nothing may be treated as removed.
+fn unreadable_prefixes(root: &Utf8Path, skipped: &[Skipped]) -> Option<Vec<String>> {
+    let mut prefixes = Vec::new();
+    for s in skipped {
+        if !matches!(s.reason, SkipReason::Unreadable(_)) {
+            continue;
+        }
+        let rel = s
+            .abs
+            .as_deref()
+            .and_then(|abs| abs.strip_prefix(root).ok())?;
+        prefixes.push(rel.as_str().replace('\\', "/"));
+    }
+    Some(prefixes)
+}
+
+fn is_protected(rel: &RelPath, prefixes: Option<&[String]>) -> bool {
+    let Some(prefixes) = prefixes else {
+        return true;
+    };
+    let rel = rel.as_str();
+    prefixes.iter().any(|p| {
+        p.is_empty()
+            || rel == p
+            || rel
+                .strip_prefix(p.as_str())
+                .is_some_and(|r| r.starts_with('/'))
+    })
 }
 
 #[cfg(test)]
