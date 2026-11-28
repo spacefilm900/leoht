@@ -120,12 +120,18 @@ impl Library {
         // Keep them; a later complete scan reconciles them.
         let protected = unreadable_prefixes(&self.paths.root, &skipped);
         let gone: Vec<_> = known
-            .into_keys()
+            .keys()
             .filter(|rel| !is_protected(rel, protected.as_deref()))
+            .cloned()
             .collect();
+        let retained = known.len() - gone.len();
         self.catalog.remove_photos(&gone)?;
-        self.catalog
-            .set_info(PROBE_VERSION_KEY, &PROBE_VERSION.to_string())?;
+        // Retained rows were not re-probed. If the probe rules changed, keep the
+        // old version recorded so the next complete scan re-probes everything.
+        if retained == 0 {
+            self.catalog
+                .set_info(PROBE_VERSION_KEY, &PROBE_VERSION.to_string())?;
+        }
         summary.removed = gone.len();
         summary.damaged = self.catalog.damaged_count()?;
         summary.skipped = skipped;

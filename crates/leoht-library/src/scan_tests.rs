@@ -185,6 +185,40 @@ fn rows_under_an_unreadable_folder_are_kept() {
     assert_eq!(after.removed, 10 - gone);
 }
 
+/// Rows kept under an unreadable folder were not re-probed, so a change of
+/// probe rules must not be recorded as done: the next complete scan re-probes
+/// them even though their size and modification time are unchanged.
+#[cfg(unix)]
+#[test]
+fn probe_rules_change_waits_for_a_complete_scan() {
+    use std::os::unix::fs::PermissionsExt;
+    let f = fixture(20);
+    let mut lib = Library::open(&f.root, Some(&f.cache)).unwrap();
+    lib.scan(|_| {}).unwrap();
+    lib.catalog.set_info(PROBE_VERSION_KEY, "0").unwrap(); // as if an older Leoht built it
+    let folder = f.root.join("year-2001/folder-00001");
+    fs::set_permissions(&folder, fs::Permissions::from_mode(0o000)).unwrap();
+    let readable = fs::read_dir(&folder).is_ok(); // true when running as root
+    let partial = lib.scan(|_| {}).unwrap();
+    fs::set_permissions(&folder, fs::Permissions::from_mode(0o755)).unwrap();
+    if readable {
+        return; // permissions are not enforced for this user; nothing to test
+    }
+    assert_eq!(partial.probed, 10, "{partial:?}");
+    assert_eq!(
+        lib.catalog.info(PROBE_VERSION_KEY).unwrap().as_deref(),
+        Some("0")
+    );
+    let complete = lib.scan(|_| {}).unwrap();
+    assert_eq!(complete.probed, 20, "{complete:?}");
+    let current = PROBE_VERSION.to_string();
+    assert_eq!(
+        lib.catalog.info(PROBE_VERSION_KEY).unwrap().as_deref(),
+        Some(current.as_str())
+    );
+    assert_eq!(lib.scan(|_| {}).unwrap().probed, 0);
+}
+
 /// If the old database cannot be deleted, the library must stay connected to
 /// the database on disk, not to the temporary in-memory one.
 #[cfg(unix)]
