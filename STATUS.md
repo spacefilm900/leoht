@@ -30,6 +30,7 @@ workflow had not yet run on `main`); Keith chose to proceed. Progress notes: `do
 | Create public repo `spacefilm900/leoht`, enable CodeRabbit, set branch protection | Repo created (public) with Keith's approval while clearance is pending; CodeRabbit active; branch protection requiring `CI OK` is set |
 | `CLEAN_ROOM.md` rule 6 wording (recorded public-repo exception) | **Confirmed by Keith 2026-11-27** |
 | Plan principle 2 and Phase 3 aligned with ADR-0002 (sidecar canonical, DB index only) | **Done**, approved by Keith 2026-11-27 |
+| ADR-0006: library layout and scanning rules (cache outside the library, `leoht-library.json`, hidden files and symlinks skipped) | **Accepted by Keith 2026-11-28** |
 | Approve ADR-0001 … ADR-0005 (and `LEOHT_PLAN.md`) | **Approved by Keith 2026-11-27, "for now"** (to be revisited as the spec and trials teach us more) |
 | Functional specification (`docs/spec/`) | **Reviewed by Keith 2026-11-27**; decisions below applied |
 | SQ-1: HEIC in trials | **Decided 2026-11-27:** trial builds exclude HEIC decoding; JPEG and PNG samples only; revisit after the G-legal review |
@@ -46,7 +47,6 @@ workflow had not yet run on `main`); Keith chose to proceed. Progress notes: `do
 | Legal review of HEVC patent exposure before distributing binaries that decode HEIC | Open (needed before any release, not before dev) |
 
 ## Open questions
-* ADR-0006 (library layout and scanning rules: cache outside the library, `leoht-library.json`, hidden files and symlinks skipped) is **Proposed**; needs Keith's approval (Gx-arch).
 * HEIC metadata is tested only on a generated metadata-only HEIF; real iPhone HEIC files (Keith's samples) are needed to confirm. CR3 is detection-only in Phase 1.
 * HEIC decoder: `heifer` vs `heic-rs` (Phase 1 spike; ADR-0004).
 * RAW approach given LGPL-2.1 Rust RAW crates and LibRaw's LGPL-2.1-or-CDDL-1.0 licence (ADR-0004, ADR-0005).

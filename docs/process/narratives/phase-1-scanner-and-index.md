@@ -21,7 +21,7 @@ scriptable CLI, and 1k/10k volume baselines (`docs/spec/01-foundations.md`, `doc
 * Tests: a generated fixture corpus (every format, EXIF variants, ICC, RAF and HEIF containers, six kinds of damaged
   file) with a golden JSON snapshot; the originals-never-modified matrix (scan, rescan, rebuild, also on a fully read-only
   library); Unicode and 400-character paths; property tests feeding random and truncated bytes to the probe.
-* ADR-0006 records the layout and scanning rules for Keith's review.
+* ADR-0006 records the layout and scanning rules; Keith accepted it on 2026-11-28.
 
 ## Prompts and agent patterns
 The executor brief asked for the Phase 1 requirements from the spec, strict adherence to ADR-0003 and the clean-room
@@ -29,7 +29,7 @@ rules, PRs of a reviewable size, no merging, and honest performance numbers ("re
 fake a pass").
 
 ## Decisions and human gates
-* Cache outside the library (rejected: a hidden `.leoht/` folder inside it), see ADR-0006. Needs Keith (Gx-arch).
+* Cache outside the library (rejected: a hidden `.leoht/` folder inside it), see ADR-0006 (accepted by Keith 2026-11-28).
 * `.leohtignore` from Phase 0 retired in favour of a visible `leoht-library.json` (FR-LIB-03 asks for a visible file).
 * HEIC is detected and its EXIF read; nothing decodes HEIC (SQ-1, G-legal).
 

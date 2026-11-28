@@ -10,7 +10,7 @@ Spec first, code second: a decision that shapes more than one crate gets an ADR 
 | [0003](0003-code-quality-standards.md) | Code-quality standards | Proposed |
 | [0004](0004-image-format-support-strategy.md) | Image format support strategy (Phase 1) | Proposed |
 | [0005](0005-licensing-and-commercial-readiness.md) | Licensing and commercial readiness | Proposed |
-| [0006](0006-library-layout-and-scanning.md) | Library layout and scanning rules (Phase 1) | Proposed |
+| [0006](0006-library-layout-and-scanning.md) | Library layout and scanning rules (Phase 1) | Accepted (2026-11-28) |
 
 Statuses: **Proposed** → **Accepted** (Keith approves via PR; see `docs/process/phase-gates.md`)
 → optionally **Superseded by ADR-NNNN**. Never edit an Accepted ADR's decision; write a new one that supersedes it.

@@ -1,6 +1,6 @@
 # ADR-0006: Library layout and scanning rules (Phase 1)
 
-* Status: Proposed
+* Status: Accepted (approved by Keith Haviland, 2026-11-28)
 * Date: 2026-11-28
 * Deciders: Keith Haviland (owner), Leoht Master (coordinator)
 
