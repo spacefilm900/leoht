@@ -104,3 +104,22 @@ fn read_raf_preview(file: &mut File, head: &[u8]) -> Result<Vec<u8>, Option<exif
         .map_err(|_| None)?;
     Ok(buf)
 }
+
+/// The embedded JPEG preview of a file, if it has one: the EXIF IFD1 thumbnail
+/// (JPEG, PNG, HEIF and TIFF-based RAW files), or the large preview a Fujifilm
+/// RAF carries in its header. Bounded reads, as for [`read_exif`].
+pub fn embedded_preview(file: &mut File, head: &[u8]) -> Option<Vec<u8>> {
+    if head.starts_with(b"FUJIFILMCCD-RAW") {
+        return read_raf_preview(file, head).ok();
+    }
+    let exif = read_exif(file, head)?;
+    let field = |tag| {
+        exif.get_field(tag, exif::In::THUMBNAIL)
+            .and_then(|f| f.value.get_uint(0))
+            .map(|v| v as usize)
+    };
+    let offset = field(exif::Tag::JPEGInterchangeFormat)?;
+    let len = field(exif::Tag::JPEGInterchangeFormatLength)?;
+    let jpeg = exif.buf().get(offset..offset.checked_add(len)?)?;
+    jpeg.starts_with(&[0xFF, 0xD8]).then(|| jpeg.to_vec())
+}

@@ -1,0 +1,23 @@
+---
+source: crates/leoht-cli/tests/cli.rs
+expression: "env.json(&[\"scan\"], 0)"
+---
+{
+  "command": "scan",
+  "library": {
+    "cache_dir": "[LIBRARY CACHE]",
+    "root": "[ROOT]"
+  },
+  "schema_version": 1,
+  "summary": {
+    "added": 20,
+    "damaged": 6,
+    "elapsed_ms": 0,
+    "found": 20,
+    "read": 20,
+    "removed": 0,
+    "skipped": [],
+    "unchanged": 0,
+    "updated": 0
+  }
+}

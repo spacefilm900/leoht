@@ -7,6 +7,9 @@ use image::{DynamicImage, ImageDecoder, ImageReader, RgbImage, imageops::FilterT
 
 use crate::ThumbError;
 
+/// Sources more than this many times the target edge are pre-shrunk.
+const PRE_SHRINK_FACTOR: u32 = 4;
+
 /// Shrinks `img` so its longest edge is at most `max_edge`, preserving aspect
 /// ratio. Images already small enough are returned as RGB without upscaling.
 #[must_use]
@@ -14,7 +17,18 @@ pub fn resize_to_fit(img: &DynamicImage, max_edge: u32) -> RgbImage {
     if img.width().max(img.height()) <= max_edge {
         return img.to_rgb8();
     }
-    // Lanczos3 is the sharpest of the standard filters; fine for thumbnails.
+    // Lanczos3 is the sharpest of the standard filters, but its cost grows
+    // with the *source* size. For big photos, first shrink cheaply (a box
+    // filter, `thumbnail`) to twice the target, then finish with Lanczos3:
+    // the result is visually the same and many times faster on a 24 MP photo.
+    let long = img.width().max(img.height());
+    if long > max_edge.saturating_mul(PRE_SHRINK_FACTOR) {
+        let mid = max_edge.saturating_mul(2);
+        let pre = DynamicImage::ImageRgb8(img.thumbnail(mid, mid).to_rgb8());
+        return pre
+            .resize(max_edge, max_edge, FilterType::Lanczos3)
+            .to_rgb8();
+    }
     img.resize(max_edge, max_edge, FilterType::Lanczos3)
         .to_rgb8()
 }
@@ -23,9 +37,9 @@ pub fn resize_to_fit(img: &DynamicImage, max_edge: u32) -> RgbImage {
 /// sideways (orientation 6, say) is upright. The `image` crate does not do this
 /// by itself: the caller must read the orientation from the decoder and apply it.
 fn decode_upright(path: &Utf8Path) -> Result<DynamicImage, image::ImageError> {
-    let mut decoder = ImageReader::open(path)?
-        .with_guessed_format()?
-        .into_decoder()?;
+    let mut reader = ImageReader::open(path)?.with_guessed_format()?;
+    reader.limits(crate::decode_limits());
+    let mut decoder = reader.into_decoder()?;
     // A missing or unreadable orientation tag means "as stored", not a failure.
     let orientation = decoder.orientation().ok();
     let mut img = DynamicImage::from_decoder(decoder)?;
@@ -84,16 +98,7 @@ pub fn render_to_cache(
         });
     }
     let thumb = thumbnail(source, max_edge)?;
-    if let Some(parent) = dest.parent() {
-        fs::create_dir_all(parent).map_err(|source| ThumbError::CacheDir {
-            path: parent.to_owned(),
-            source,
-        })?;
-    }
-    thumb.save(dest).map_err(|source| ThumbError::Write {
-        path: dest.to_owned(),
-        source,
-    })
+    crate::write_atomically(&thumb, dest)
 }
 
 #[cfg(test)]

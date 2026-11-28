@@ -146,6 +146,15 @@ impl Library {
         Ok(summary)
     }
 
+    /// True once a scan has completed for this catalog (a fresh or rebuilt
+    /// catalog is empty because it was never filled, not because the folder is).
+    ///
+    /// # Errors
+    /// Catalog failure.
+    pub fn is_scanned(&self) -> Result<bool, LibraryError> {
+        Ok(self.catalog.info(PROBE_VERSION_KEY)?.is_some())
+    }
+
     /// Deletes the catalog and rebuilds it with a full scan (FR-LIB-08). This is
     /// the normal recovery path; user-authored data lives in sidecars and is
     /// unaffected (FR-FND-02).

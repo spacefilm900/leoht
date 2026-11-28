@@ -13,6 +13,7 @@ publish.workspace = true
 leoht-core.workspace = true
 leoht-catalog.workspace = true
 leoht-scan.workspace = true
+leoht-thumb.workspace = true
 blake3.workspace = true
 camino.workspace = true
 thiserror.workspace = true
@@ -20,6 +21,7 @@ tracing.workspace = true
 
 [dev-dependencies]
 leoht-testkit.workspace = true
+image.workspace = true
 tempfile.workspace = true
 
 [lints]

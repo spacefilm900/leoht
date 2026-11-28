@@ -1,0 +1,31 @@
+# FR-LIB-04 / SQ-1: things that would make a Leoht build decode HEIC.
+# Trial (Gt) builds must contain none of them until the G-legal review.
+# `cargo xtask check-trial` fails if any listed crate is in the trial
+# build's dependency tree, or any listed cargo feature is enabled on any crate.
+#
+# Keep this list current: a PR that adds a HEIC decoder or a feature for one
+# adds its names here in the same PR (ADR-0004, ADR-0005).
+#
+# Format: `crate <name>` or `feature <name>`, one per line.
+
+# Pure-Rust decoders considered in ADR-0004
+crate heifer
+crate heic-rs
+crate heic-decoder
+# Rejected for licence (AGPL), listed so it can never slip in
+crate heic
+# C library bindings (optional fallback in ADR-0004)
+crate libheif-rs
+crate libheif-sys
+# HEVC decoders that would be used underneath
+crate libde265-sys
+crate ffmpeg-sys-next
+
+# Feature names reserved for HEIC decoding (ADR-0004 and ADR-0005)
+feature heic
+feature heic-decode
+feature heic-heifer
+feature heic-rs
+feature heic-libheif
+feature heic-system
+feature libheif

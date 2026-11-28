@@ -7,8 +7,9 @@ _Last updated: 2026-11-28 by Leoht Master. Update this file in every PR that mov
 (non-blocking) Windows; CodeRabbit has reviewed. The clean-room Picasa feature inventory (`docs/research/`) and the early-feature-trial gate (Gt) are merged (PR #2). The functional specification (`docs/spec/functional-spec.md`, 107 requirements) was reviewed by Keith on 2026-11-27 (PR #3) and his decisions are applied.
 
 **Phase 1 — scanner and index: in progress** (started 2026-11-28 at Keith's instruction, "Do start"). Work lands as a
-series of PRs, none merged without Keith: (1) scanner, metadata and catalog index (`phase-1/scanner-index`);
-(2) thumbnails and the CLI; (3) volume and performance baselines. Not every G1 entry criterion was met when Phase 1
+series of PRs, none merged without Keith: (1) scanner, metadata and catalog index (`phase-1/scanner-index`, PR #4);
+(2) thumbnails, the CLI (`docs/cli.md`), the no-network test and the HEIC trial check (`phase-1/thumbs-cli`, stacked on #4);
+(3) volume and performance baselines. File watching (FR-LIB-02) is not done yet. Not every G1 entry criterion was met when Phase 1
 started (G0a trademark is open; Phase 1 tasks are tracked in PRs rather than separate issues; the nightly `Volume`
 workflow had not yet run on `main`); Keith chose to proceed. Progress notes: `docs/process/narratives/phase-1-scanner-and-index.md`.
 
@@ -16,7 +17,7 @@ workflow had not yet run on `main`); Keith chose to proceed. Progress notes: `do
 | Phase | Scope (from LEOHT_PLAN.md) | State |
 |-------|----------------------------|-------|
 | 0 | Repo structure, data model, ADRs, CI skeleton, test harness, quality standards | **Done** (PRs #1–#3 merged; G0a trademark still open) |
-| 1 | Scanner & index, JPEG/PNG/HEIC/RAW, EXIF, thumbnails, SQLite + watch, CLI demo, volume tests 1k–10k | **In progress** (scanner + index PR open for review) |
+| 1 | Scanner & index, JPEG/PNG/HEIC/RAW, EXIF, thumbnails, SQLite + watch, CLI demo, volume tests 1k–10k | **In progress** (PR #4 scanner + index and PR #5 thumbnails + CLI open for review) |
 | 2 | Viewer & grid UI (egui) | Not started |
 | 3 | Non-destructive edit engine | Not started |
 | 4 | Stars, captions, tags, albums, search | Not started |

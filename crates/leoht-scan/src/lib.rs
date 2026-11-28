@@ -22,7 +22,7 @@ use leoht_core::Photo;
 pub use config::{CONFIG_FILE, CONFIG_VERSION, LibraryConfig};
 pub use error::ScanError;
 pub use hash::hash_file;
-pub use probe::{MAX_PIXELS, PROBE_VERSION, matches_format, probe_file};
+pub use probe::{MAX_PIXELS, PROBE_VERSION, embedded_preview, matches_format, probe_file};
 pub use walk::{FoundFile, SkipReason, Skipped, walk_library};
 
 #[cfg(feature = "watch")]

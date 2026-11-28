@@ -1,71 +1,120 @@
-//! `leoht`: command-line driver. Phase 0 offers `scan` and `index`; the
-//! Phase 1 demo grows from here before any GUI exists.
+//! `leoht`: the scriptable core (FR-FND-09). Every command prints a human
+//! summary by default and one JSON document with `--json`; exit codes are
+//! documented in `docs/cli.md` and in [`exit`].
 
 // A CLI exists to print; the workspace-wide print lints are for library crates.
 #![allow(clippy::print_stdout, clippy::print_stderr)]
 
-use anyhow::{Context, Result};
+mod commands;
+mod exit;
+mod output;
+
+use std::process::ExitCode;
+
 use camino::Utf8PathBuf;
 use clap::{Parser, Subcommand};
-use leoht_catalog::Catalog;
+
+use crate::output::Output;
 
 #[derive(Parser)]
-#[command(name = "leoht", version, about = "Folder-first photo management")]
+#[command(
+    name = "leoht",
+    version,
+    about = "Folder-first photo management: scan, list, thumbnail and verify a photo folder.",
+    after_help = "Leoht never changes, moves or deletes your photos, and never uses the network.\n\
+                  Exit codes: 0 ok, 1 error, 2 usage error, 3 verify found drift."
+)]
 struct Cli {
+    /// Print one JSON document on stdout instead of human-readable text.
+    #[arg(long, global = true)]
+    json: bool,
+    /// Where Leoht keeps catalogs and thumbnails (default: `LEOHT_CACHE_DIR`, else
+    /// the per-user cache folder). Never inside the library.
+    #[arg(long, global = true, value_name = "DIR")]
+    cache_dir: Option<Utf8PathBuf>,
     #[command(subcommand)]
     command: Command,
 }
 
 #[derive(Subcommand)]
 enum Command {
-    /// List the photos found under a folder (read-only).
+    /// Scan a folder into its catalog, reading only new and changed files.
     Scan {
         /// Library root folder.
         root: Utf8PathBuf,
     },
-    /// Scan a folder and (re)build its catalog database.
-    Index {
+    /// List the photos in the catalog (run `scan` first).
+    List {
         /// Library root folder.
         root: Utf8PathBuf,
-        /// Catalog file to write.
-        #[arg(long, default_value = "leoht-catalog.sqlite")]
-        db: Utf8PathBuf,
+        /// Only photos that could not be read, with the reason.
+        #[arg(long)]
+        damaged: bool,
+        /// Only photos of this format (jpeg, heic, png, raw, tiff, webp).
+        #[arg(long, value_name = "FORMAT")]
+        format: Option<String>,
+    },
+    /// Make missing thumbnails (JPEG, PNG, and RAW embedded previews).
+    Thumbs {
+        /// Library root folder.
+        root: Utf8PathBuf,
+        /// Longest edge in pixels.
+        #[arg(long, default_value_t = leoht_library::DEFAULT_THUMB_EDGE,
+              value_parser = clap::value_parser!(u32).range(16..=4096))]
+        size: u32,
+        /// Worker threads (default: one per core, at most 8).
+        #[arg(long, value_parser = clap::value_parser!(u16).range(1..=64))]
+        workers: Option<u16>,
+    },
+    /// Compare the catalog with the disk without changing anything; exit 3 on drift.
+    Verify {
+        /// Library root folder.
+        root: Utf8PathBuf,
+        /// Also re-read every hashed photo and compare content hashes.
+        #[arg(long)]
+        hashes: bool,
+    },
+    /// Delete the catalog and scan from scratch (the normal recovery path).
+    Rebuild {
+        /// Library root folder.
+        root: Utf8PathBuf,
+    },
+    /// Version, platform and cache locations (for bug reports and trial notes).
+    Info {
+        /// Optional library root: also show its cache folder and counts.
+        root: Option<Utf8PathBuf>,
     },
 }
 
-fn main() -> Result<()> {
+fn main() -> ExitCode {
     tracing_subscriber::fmt()
         .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
         .with_writer(std::io::stderr)
         .init();
-
-    match Cli::parse().command {
-        Command::Scan { root } => {
-            let report =
-                leoht_scan::scan_library(&root).with_context(|| format!("scanning {root}"))?;
-            for photo in &report.photos {
-                println!(
-                    "{}\t{}\t{} bytes",
-                    photo.path,
-                    photo.format.name(),
-                    photo.size_bytes
-                );
-            }
-            eprintln!(
-                "{} photos, {} skipped",
-                report.photos.len(),
-                report.skipped.len()
-            );
-        }
-        Command::Index { root, db } => {
-            let report =
-                leoht_scan::scan_library(&root).with_context(|| format!("scanning {root}"))?;
-            let mut catalog = Catalog::open(&db).context("opening catalog")?;
-            // The catalog is a cache, so a full rebuild is safe, and `replace_photos`
-            // does the swap in one transaction: a failure keeps the previous index.
-            catalog.replace_photos(&report.photos)?;
-            println!("indexed {} photos into {}", catalog.photo_count()?, db);
+    let cli = Cli::parse();
+    let out = Output::new(cli.json);
+    let cache = cli.cache_dir.as_deref();
+    let result = match &cli.command {
+        Command::Scan { root } => commands::scan::run(&out, root, cache, false),
+        Command::Rebuild { root } => commands::scan::run(&out, root, cache, true),
+        Command::List {
+            root,
+            damaged,
+            format,
+        } => commands::list::run(&out, root, cache, *damaged, format.as_deref()),
+        Command::Thumbs {
+            root,
+            size,
+            workers,
+        } => commands::thumbs::run(&out, root, cache, *size, workers.map(usize::from)),
+        Command::Verify { root, hashes } => commands::verify::run(&out, root, cache, *hashes),
+        Command::Info { root } => commands::info::run(&out, root.as_deref(), cache),
+    };
+    match result {
+        Ok(code) => code.into(),
+        Err(e) => {
+            out.error(&e);
+            exit::ERROR.into()
         }
     }
-    Ok(())
 }

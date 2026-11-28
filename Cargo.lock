@@ -712,9 +712,14 @@ dependencies = [
  "anyhow",
  "camino",
  "clap",
+ "insta",
  "leoht-catalog",
  "leoht-core",
+ "leoht-library",
  "leoht-scan",
+ "leoht-testkit",
+ "serde_json",
+ "tempfile",
  "tracing",
  "tracing-subscriber",
 ]
@@ -768,10 +773,12 @@ version = "0.0.0"
 dependencies = [
  "blake3",
  "camino",
+ "image",
  "leoht-catalog",
  "leoht-core",
  "leoht-scan",
  "leoht-testkit",
+ "leoht-thumb",
  "tempfile",
  "thiserror",
  "tracing",
@@ -817,6 +824,7 @@ dependencies = [
  "camino",
  "image",
  "leoht-core",
+ "leoht-testkit",
  "tempfile",
  "thiserror",
 ]
@@ -1590,6 +1598,7 @@ dependencies = [
  "camino",
  "clap",
  "leoht-testkit",
+ "tempfile",
 ]
 
 [[package]]

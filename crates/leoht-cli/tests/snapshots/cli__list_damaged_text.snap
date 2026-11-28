@@ -1,0 +1,11 @@
+---
+source: crates/leoht-cli/tests/cli.rs
+expression: text
+---
+damaged/empty.jpg	jpeg	0	2021-03-04T05:06:07Z	DAMAGED empty: the file is empty
+damaged/garbled.png	png	18	2021-03-04T05:06:07Z	DAMAGED unreadable_header: unexpected end of file
+damaged/huge-dimensions.jpg	jpeg	656	2021-03-04T05:06:07Z	DAMAGED too_large: 65000 x 65000 pixels is over the 400000000-pixel safety limit
+damaged/noise.nef	raw	512	2021-03-04T05:06:07Z	DAMAGED content_mismatch: the content is not a valid raw file
+damaged/text-file.jpg	jpeg	20	2021-03-04T05:06:07Z	DAMAGED content_mismatch: the content is not a valid jpeg file
+damaged/truncated.jpg	jpeg	20	2021-03-04T05:06:07Z	DAMAGED unreadable_header: truncated before frame header
+6 photos

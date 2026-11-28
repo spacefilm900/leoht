@@ -2,7 +2,7 @@
 
 * Dates: 2026-11-28 → (open)
 * Agents/roles involved: Leoht Master (coordinator), one executor agent working locally on a clone of the public repo
-* PRs / issues: scanner + index (this note's first PR); thumbnails + CLI and volume/perf to follow
+* PRs / issues: #4 scanner + index; #5 thumbnails, CLI, no-network and trial checks (stacked on #4); volume/perf to follow
 
 _Progress note, updated with each Phase 1 PR. It becomes the Phase 1 narrative at the phase exit (Gn)._
 
@@ -22,6 +22,24 @@ scriptable CLI, and 1k/10k volume baselines (`docs/spec/01-foundations.md`, `doc
   file) with a golden JSON snapshot; the originals-never-modified matrix (scan, rescan, rebuild, also on a fully read-only
   library); Unicode and 400-character paths; property tests feeding random and truncated bytes to the probe.
 * ADR-0006 records the layout and scanning rules; Keith accepted it on 2026-11-28.
+
+### PR: thumbnails, CLI, no-network and trial checks
+* `leoht-thumb` chooses a source per photo: the embedded JPEG preview when it is at least the thumbnail size (and
+  always for RAW, which is never decoded), otherwise a full decode under memory limits. Orientation is applied in both
+  paths; a golden table of all eight EXIF orientations, worked out from the EXIF definitions rather than from the
+  `image` crate, is checked for JPEG and PNG. Big sources are pre-shrunk with a cheap filter before Lanczos3.
+  Thumbnails are written atomically (temp file and rename).
+* `leoht-library` gained `make_thumbnails` (content-hash keyed cache, parallel workers with `std::thread::scope`,
+  hashes and decode failures recorded in the catalog) and a read-only `verify`.
+* The `leoht` CLI now has `scan`, `list`, `thumbs`, `verify`, `rebuild` and `info`, each with `--json`, a
+  `schema_version`, and documented exit codes (`docs/cli.md`). Contract tests run the real binary and pin the
+  output with insta snapshots.
+* FR-FND-08: the binary runs a full scenario under `strace` (Linux) or a kill-on-network `sandbox-exec` profile
+  (macOS), and a deliberate canary connection proves each recorder catches attempts. `deny.toml` bans HTTP, TLS and
+  telemetry crates.
+* FR-LIB-04: `cargo xtask check-trial` (CI job on macos-15, part of `CI OK`) fails if the trial build's dependency
+  tree contains a HEIC decoder crate or enables a HEIC feature, from the list in `xtask/heic-decoding.txt`, or if a
+  trial sample is a HEIC/HEIF file by extension or content.
 
 ## Prompts and agent patterns
 The executor brief asked for the Phase 1 requirements from the spec, strict adherence to ADR-0003 and the clean-room
@@ -58,6 +76,10 @@ fake a pass").
   EXIF reader rejects their private TIFF magic numbers; the JPEG frame header and ICC chunk loop were not fully bounded;
   a PNG `sRGB` chunk was ignored. All fixed with tests. Lesson: the hostile-input property tests found none of these,
   because they are about *plausible* inputs handled wrongly, not malformed ones.
+* PR #4's Windows job (non-blocking) failed: a Unicode fixture name contained a tab, which Windows forbids. Linux and
+  macOS accept it, so the required checks were green. Fixed by leaving that one name out on Windows.
+* The sandbox for the strace-based no-network test could not use the package manager (no root), so strace was
+  unpacked from the Debian archive into the home folder to run the test locally before CI.
 
 ## Numbers
 _Filled in as PRs land: test counts by level, CI duration, and the 1k/10k measurements against FR-FND-07._

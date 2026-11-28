@@ -4,6 +4,7 @@
 //! * `gen-library`  – write a deterministic synthetic photo library (for volume tests).
 //! * `bless`        – regenerate golden-image references after an intended change.
 //! * `check-size`   – enforce the source-file size limits from ADR-0003.
+//! * `check-trial` – fail if the trial build could decode HEIC or ships HEIC samples (FR-LIB-04).
 //! * `ci`           – run the same required checks as CI, locally (needs `cargo-deny`).
 //!
 //! Every command works from the workspace root, whatever folder it is invoked from.
@@ -12,6 +13,7 @@
 #![allow(clippy::print_stdout, clippy::print_stderr)]
 
 mod size;
+mod trial;
 
 use std::path::PathBuf;
 use std::process::Command;
@@ -49,7 +51,19 @@ enum Task {
     Bless,
     /// Fail if any Rust file exceeds the hard size limit; warn above the soft limit.
     CheckSize,
-    /// fmt, clippy, tests, docs, cargo-deny and size check: the required CI checks.
+    /// Fail if the trial build could decode HEIC or ships HEIC samples (FR-LIB-04, SQ-1).
+    CheckTrial {
+        /// The package built for the trial.
+        #[arg(long, default_value = "leoht-cli")]
+        package: String,
+        /// Extra features the trial build enables.
+        #[arg(long, value_delimiter = ',')]
+        features: Vec<String>,
+        /// Sample folders shipped with the trial (repo-relative; missing ones are fine).
+        #[arg(long = "samples", default_value = "trial/samples")]
+        samples: Vec<String>,
+    },
+    /// fmt, clippy, tests, docs, cargo-deny, size and trial checks: the required CI checks.
     Ci,
 }
 
@@ -88,6 +102,11 @@ fn main() -> Result<()> {
             &[("LEOHT_BLESS", "1")],
         ),
         Task::CheckSize => size::check(&workspace_root()),
+        Task::CheckTrial {
+            package,
+            features,
+            samples,
+        } => trial::check(&workspace_root(), &package, &features, &samples),
         Task::Ci => {
             run("cargo", &["fmt", "--all", "--check"], &[])?;
             run(
@@ -126,7 +145,13 @@ fn main() -> Result<()> {
                 );
             }
             run("cargo", &["deny", "--all-features", "check"], &[])?;
-            size::check(&workspace_root())
+            size::check(&workspace_root())?;
+            trial::check(
+                &workspace_root(),
+                "leoht-cli",
+                &[],
+                &["trial/samples".to_owned()],
+            )
         }
     }
 }

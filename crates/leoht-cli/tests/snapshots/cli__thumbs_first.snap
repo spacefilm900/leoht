@@ -1,0 +1,22 @@
+---
+source: crates/leoht-cli/tests/cli.rs
+expression: "env.json(&[\"thumbs\", \"--size\", \"64\"], 0)"
+---
+{
+  "command": "thumbs",
+  "schema_version": 1,
+  "size": 64,
+  "summary": {
+    "cached": 0,
+    "elapsed_ms": 0,
+    "eligible": 10,
+    "from_preview": 1,
+    "generated": 9,
+    "newly_damaged": 0,
+    "no_preview": 1,
+    "skipped_damaged": 6,
+    "unsupported": 4,
+    "write_errors": []
+  },
+  "thumbs_dir": "[LIBRARY CACHE]"
+}
