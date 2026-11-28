@@ -1,0 +1,649 @@
+---
+source: tests/scan_corpus.rs
+expression: golden
+---
+[
+  {
+    "damage": {
+      "detail": "the file is empty",
+      "kind": "empty"
+    },
+    "format": "jpeg",
+    "meta": {
+      "camera_make": null,
+      "camera_model": null,
+      "capture_time": {
+        "local": "2021-03-04T05:06:07Z",
+        "offset": null,
+        "source": "file_modified"
+      },
+      "color": {
+        "kind": "untagged"
+      },
+      "exposure": {
+        "exposure_time": null,
+        "f_number": null,
+        "focal_length_mm": null,
+        "iso": null
+      },
+      "height": null,
+      "lens_model": null,
+      "orientation": 1,
+      "width": null
+    },
+    "path": "damaged/empty.jpg",
+    "support": "full"
+  },
+  {
+    "damage": {
+      "detail": "unexpected end of file",
+      "kind": "unreadable_header"
+    },
+    "format": "png",
+    "meta": {
+      "camera_make": null,
+      "camera_model": null,
+      "capture_time": {
+        "local": "2021-03-04T05:06:07Z",
+        "offset": null,
+        "source": "file_modified"
+      },
+      "color": {
+        "kind": "untagged"
+      },
+      "exposure": {
+        "exposure_time": null,
+        "f_number": null,
+        "focal_length_mm": null,
+        "iso": null
+      },
+      "height": null,
+      "lens_model": null,
+      "orientation": 1,
+      "width": null
+    },
+    "path": "damaged/garbled.png",
+    "support": "full"
+  },
+  {
+    "damage": {
+      "detail": "65000 x 65000 pixels is over the 400000000-pixel safety limit",
+      "kind": "too_large"
+    },
+    "format": "jpeg",
+    "meta": {
+      "camera_make": null,
+      "camera_model": null,
+      "capture_time": {
+        "local": "2021-03-04T05:06:07Z",
+        "offset": null,
+        "source": "file_modified"
+      },
+      "color": {
+        "kind": "untagged"
+      },
+      "exposure": {
+        "exposure_time": null,
+        "f_number": null,
+        "focal_length_mm": null,
+        "iso": null
+      },
+      "height": 65000,
+      "lens_model": null,
+      "orientation": 1,
+      "width": 65000
+    },
+    "path": "damaged/huge-dimensions.jpg",
+    "support": "full"
+  },
+  {
+    "damage": {
+      "detail": "the content is not a valid raw file",
+      "kind": "content_mismatch"
+    },
+    "format": "raw",
+    "meta": {
+      "camera_make": null,
+      "camera_model": null,
+      "capture_time": {
+        "local": "2021-03-04T05:06:07Z",
+        "offset": null,
+        "source": "file_modified"
+      },
+      "color": {
+        "kind": "untagged"
+      },
+      "exposure": {
+        "exposure_time": null,
+        "f_number": null,
+        "focal_length_mm": null,
+        "iso": null
+      },
+      "height": null,
+      "lens_model": null,
+      "orientation": 1,
+      "width": null
+    },
+    "path": "damaged/noise.nef",
+    "support": "partial"
+  },
+  {
+    "damage": {
+      "detail": "the content is not a valid jpeg file",
+      "kind": "content_mismatch"
+    },
+    "format": "jpeg",
+    "meta": {
+      "camera_make": null,
+      "camera_model": null,
+      "capture_time": {
+        "local": "2021-03-04T05:06:07Z",
+        "offset": null,
+        "source": "file_modified"
+      },
+      "color": {
+        "kind": "untagged"
+      },
+      "exposure": {
+        "exposure_time": null,
+        "f_number": null,
+        "focal_length_mm": null,
+        "iso": null
+      },
+      "height": null,
+      "lens_model": null,
+      "orientation": 1,
+      "width": null
+    },
+    "path": "damaged/text-file.jpg",
+    "support": "full"
+  },
+  {
+    "damage": {
+      "detail": "truncated before frame header",
+      "kind": "unreadable_header"
+    },
+    "format": "jpeg",
+    "meta": {
+      "camera_make": null,
+      "camera_model": null,
+      "capture_time": {
+        "local": "2021-03-04T05:06:07Z",
+        "offset": null,
+        "source": "file_modified"
+      },
+      "color": {
+        "kind": "untagged"
+      },
+      "exposure": {
+        "exposure_time": null,
+        "f_number": null,
+        "focal_length_mm": null,
+        "iso": null
+      },
+      "height": null,
+      "lens_model": null,
+      "orientation": 1,
+      "width": null
+    },
+    "path": "damaged/truncated.jpg",
+    "support": "full"
+  },
+  {
+    "damage": null,
+    "format": "heic",
+    "meta": {
+      "camera_make": "Leoht Test Camera Co.",
+      "camera_model": "Model T1",
+      "capture_time": {
+        "local": "2023-08-19T17:45:12",
+        "offset": "+01:00",
+        "source": "exif_original"
+      },
+      "color": {
+        "kind": "srgb"
+      },
+      "exposure": {
+        "exposure_time": {
+          "den": 250,
+          "num": 1
+        },
+        "f_number": {
+          "den": 10,
+          "num": 18
+        },
+        "focal_length_mm": {
+          "den": 1,
+          "num": 35
+        },
+        "iso": 200
+      },
+      "height": 32,
+      "lens_model": "Fixture 35mm F1.8",
+      "orientation": 6,
+      "width": 48
+    },
+    "path": "heic/exif-only.HEIC",
+    "support": "full"
+  },
+  {
+    "damage": null,
+    "format": "heic",
+    "meta": {
+      "camera_make": null,
+      "camera_model": null,
+      "capture_time": {
+        "local": "2021-03-04T05:06:07Z",
+        "offset": null,
+        "source": "file_modified"
+      },
+      "color": {
+        "kind": "untagged"
+      },
+      "exposure": {
+        "exposure_time": null,
+        "f_number": null,
+        "focal_length_mm": null,
+        "iso": null
+      },
+      "height": null,
+      "lens_model": null,
+      "orientation": 1,
+      "width": null
+    },
+    "path": "heic/stub.heic",
+    "support": "full"
+  },
+  {
+    "damage": null,
+    "format": "jpeg",
+    "meta": {
+      "camera_make": null,
+      "camera_model": "No Clock",
+      "capture_time": {
+        "local": "2021-03-04T05:06:07Z",
+        "offset": null,
+        "source": "file_modified"
+      },
+      "color": {
+        "kind": "untagged"
+      },
+      "exposure": {
+        "exposure_time": null,
+        "f_number": null,
+        "focal_length_mm": null,
+        "iso": null
+      },
+      "height": 32,
+      "lens_model": null,
+      "orientation": 1,
+      "width": 48
+    },
+    "path": "jpeg/blank-date.jpeg",
+    "support": "full"
+  },
+  {
+    "damage": null,
+    "format": "jpeg",
+    "meta": {
+      "camera_make": "Padded Maker",
+      "camera_model": null,
+      "capture_time": {
+        "local": "2019-01-02T03:04:05",
+        "offset": null,
+        "source": "exif_digitized"
+      },
+      "color": {
+        "kind": "untagged"
+      },
+      "exposure": {
+        "exposure_time": null,
+        "f_number": null,
+        "focal_length_mm": null,
+        "iso": null
+      },
+      "height": 32,
+      "lens_model": null,
+      "orientation": 1,
+      "width": 48
+    },
+    "path": "jpeg/digitized-only.JPG",
+    "support": "full"
+  },
+  {
+    "damage": null,
+    "format": "jpeg",
+    "meta": {
+      "camera_make": "Leoht Test Camera Co.",
+      "camera_model": "Model T1",
+      "capture_time": {
+        "local": "2023-08-19T17:45:12",
+        "offset": "+01:00",
+        "source": "exif_original"
+      },
+      "color": {
+        "description": "Display P3",
+        "kind": "icc"
+      },
+      "exposure": {
+        "exposure_time": {
+          "den": 250,
+          "num": 1
+        },
+        "f_number": {
+          "den": 10,
+          "num": 18
+        },
+        "focal_length_mm": {
+          "den": 1,
+          "num": 35
+        },
+        "iso": 200
+      },
+      "height": 32,
+      "lens_model": "Fixture 35mm F1.8",
+      "orientation": 6,
+      "width": 48
+    },
+    "path": "jpeg/full-exif.jpg",
+    "support": "full"
+  },
+  {
+    "damage": null,
+    "format": "jpeg",
+    "meta": {
+      "camera_make": null,
+      "camera_model": null,
+      "capture_time": {
+        "local": "2021-03-04T05:06:07Z",
+        "offset": null,
+        "source": "file_modified"
+      },
+      "color": {
+        "kind": "untagged"
+      },
+      "exposure": {
+        "exposure_time": null,
+        "f_number": null,
+        "focal_length_mm": null,
+        "iso": null
+      },
+      "height": 32,
+      "lens_model": null,
+      "orientation": 1,
+      "width": 48
+    },
+    "path": "jpeg/no-exif.jpg",
+    "support": "full"
+  },
+  {
+    "damage": null,
+    "format": "jpeg",
+    "meta": {
+      "camera_make": "Leoht Test Camera Co.",
+      "camera_model": "Model T1",
+      "capture_time": {
+        "local": "2023-08-19T17:45:12",
+        "offset": "+01:00",
+        "source": "exif_original"
+      },
+      "color": {
+        "kind": "srgb"
+      },
+      "exposure": {
+        "exposure_time": {
+          "den": 250,
+          "num": 1
+        },
+        "f_number": {
+          "den": 10,
+          "num": 18
+        },
+        "focal_length_mm": {
+          "den": 1,
+          "num": 35
+        },
+        "iso": 200
+      },
+      "height": 32,
+      "lens_model": "Fixture 35mm F1.8",
+      "orientation": 6,
+      "width": 48
+    },
+    "path": "jpeg/with-preview.jpg",
+    "support": "full"
+  },
+  {
+    "damage": null,
+    "format": "tiff",
+    "meta": {
+      "camera_make": "Leoht Test Camera Co.",
+      "camera_model": "Model T1",
+      "capture_time": {
+        "local": "2023-08-19T17:45:12",
+        "offset": "+01:00",
+        "source": "exif_original"
+      },
+      "color": {
+        "kind": "srgb"
+      },
+      "exposure": {
+        "exposure_time": {
+          "den": 250,
+          "num": 1
+        },
+        "f_number": {
+          "den": 10,
+          "num": 18
+        },
+        "focal_length_mm": {
+          "den": 1,
+          "num": 35
+        },
+        "iso": 200
+      },
+      "height": 32,
+      "lens_model": "Fixture 35mm F1.8",
+      "orientation": 6,
+      "width": 48
+    },
+    "path": "other/scan.tif",
+    "support": "detect_only"
+  },
+  {
+    "damage": null,
+    "format": "webp",
+    "meta": {
+      "camera_make": null,
+      "camera_model": null,
+      "capture_time": {
+        "local": "2021-03-04T05:06:07Z",
+        "offset": null,
+        "source": "file_modified"
+      },
+      "color": {
+        "kind": "untagged"
+      },
+      "exposure": {
+        "exposure_time": null,
+        "f_number": null,
+        "focal_length_mm": null,
+        "iso": null
+      },
+      "height": null,
+      "lens_model": null,
+      "orientation": 1,
+      "width": null
+    },
+    "path": "other/web.webp",
+    "support": "detect_only"
+  },
+  {
+    "damage": null,
+    "format": "png",
+    "meta": {
+      "camera_make": "Leoht Test Camera Co.",
+      "camera_model": "Model T1",
+      "capture_time": {
+        "local": "2023-08-19T17:45:12",
+        "offset": "+01:00",
+        "source": "exif_original"
+      },
+      "color": {
+        "kind": "srgb"
+      },
+      "exposure": {
+        "exposure_time": {
+          "den": 250,
+          "num": 1
+        },
+        "f_number": {
+          "den": 10,
+          "num": 18
+        },
+        "focal_length_mm": {
+          "den": 1,
+          "num": 35
+        },
+        "iso": 200
+      },
+      "height": 32,
+      "lens_model": "Fixture 35mm F1.8",
+      "orientation": 6,
+      "width": 48
+    },
+    "path": "png/exif.png",
+    "support": "full"
+  },
+  {
+    "damage": null,
+    "format": "png",
+    "meta": {
+      "camera_make": null,
+      "camera_model": null,
+      "capture_time": {
+        "local": "2021-03-04T05:06:07Z",
+        "offset": null,
+        "source": "file_modified"
+      },
+      "color": {
+        "description": "Display P3",
+        "kind": "icc"
+      },
+      "exposure": {
+        "exposure_time": null,
+        "f_number": null,
+        "focal_length_mm": null,
+        "iso": null
+      },
+      "height": 32,
+      "lens_model": null,
+      "orientation": 1,
+      "width": 48
+    },
+    "path": "png/icc-p3.png",
+    "support": "full"
+  },
+  {
+    "damage": null,
+    "format": "png",
+    "meta": {
+      "camera_make": null,
+      "camera_model": null,
+      "capture_time": {
+        "local": "2021-03-04T05:06:07Z",
+        "offset": null,
+        "source": "file_modified"
+      },
+      "color": {
+        "kind": "untagged"
+      },
+      "exposure": {
+        "exposure_time": null,
+        "f_number": null,
+        "focal_length_mm": null,
+        "iso": null
+      },
+      "height": 32,
+      "lens_model": null,
+      "orientation": 1,
+      "width": 48
+    },
+    "path": "png/plain.png",
+    "support": "full"
+  },
+  {
+    "damage": null,
+    "format": "raw",
+    "meta": {
+      "camera_make": "Leoht Test Camera Co.",
+      "camera_model": "Model T1",
+      "capture_time": {
+        "local": "2023-08-19T17:45:12",
+        "offset": "+01:00",
+        "source": "exif_original"
+      },
+      "color": {
+        "kind": "srgb"
+      },
+      "exposure": {
+        "exposure_time": {
+          "den": 250,
+          "num": 1
+        },
+        "f_number": {
+          "den": 10,
+          "num": 18
+        },
+        "focal_length_mm": {
+          "den": 1,
+          "num": 35
+        },
+        "iso": 200
+      },
+      "height": 32,
+      "lens_model": "Fixture 35mm F1.8",
+      "orientation": 6,
+      "width": 48
+    },
+    "path": "raw/fuji.raf",
+    "support": "partial"
+  },
+  {
+    "damage": null,
+    "format": "raw",
+    "meta": {
+      "camera_make": "Leoht Test Camera Co.",
+      "camera_model": "Model T1",
+      "capture_time": {
+        "local": "2023-08-19T17:45:12",
+        "offset": "+01:00",
+        "source": "exif_original"
+      },
+      "color": {
+        "kind": "srgb"
+      },
+      "exposure": {
+        "exposure_time": {
+          "den": 250,
+          "num": 1
+        },
+        "f_number": {
+          "den": 10,
+          "num": 18
+        },
+        "focal_length_mm": {
+          "den": 1,
+          "num": 35
+        },
+        "iso": 200
+      },
+      "height": 32,
+      "lens_model": "Fixture 35mm F1.8",
+      "orientation": 6,
+      "width": 48
+    },
+    "path": "raw/tiff-based.cr2",
+    "support": "partial"
+  }
+]

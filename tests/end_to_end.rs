@@ -26,7 +26,7 @@ fn a_small_library_flows_through_every_crate() {
     // Scan: every generated file is detected; folders come out as expected.
     let mut report = scan_library(&lib.root).unwrap();
     assert_eq!(report.photos.len(), 40);
-    assert_eq!(report.skipped, 0);
+    assert!(report.skipped.is_empty(), "{:?}", report.skipped);
 
     // Hash, then index into the catalog.
     for photo in &mut report.photos {

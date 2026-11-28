@@ -16,6 +16,12 @@ pub enum CoreError {
     /// A content hash was not `blake3:` followed by 64 lowercase hex digits.
     #[error("invalid content hash {0:?}: expected `blake3:` + 64 lowercase hex digits")]
     InvalidHash(String),
+    /// An EXIF orientation outside 1 to 8.
+    #[error("invalid EXIF orientation {0}: expected 1 to 8")]
+    InvalidOrientation(u8),
+    /// A rational number with a zero denominator.
+    #[error("invalid rational: the denominator is zero")]
+    ZeroDenominator,
     /// An edit operation had an out-of-range or non-finite parameter.
     #[error("invalid edit operation `{op}`: {reason}")]
     InvalidEdit {

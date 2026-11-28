@@ -45,11 +45,17 @@ fn main() -> Result<()> {
                 leoht_scan::scan_library(&root).with_context(|| format!("scanning {root}"))?;
             for photo in &report.photos {
                 println!(
-                    "{}\t{:?}\t{} bytes",
-                    photo.path, photo.format, photo.size_bytes
+                    "{}\t{}\t{} bytes",
+                    photo.path,
+                    photo.format.name(),
+                    photo.size_bytes
                 );
             }
-            eprintln!("{} photos, {} skipped", report.photos.len(), report.skipped);
+            eprintln!(
+                "{} photos, {} skipped",
+                report.photos.len(),
+                report.skipped.len()
+            );
         }
         Command::Index { root, db } => {
             let report =

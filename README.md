@@ -17,11 +17,12 @@ Google Picasa. Mac first, then Linux and Windows. Your folders are the source of
 |-------|---------|
 | `leoht-core` | Domain model (photos, folders, albums, edit recipes). No I/O, UI-agnostic. |
 | `leoht-catalog` | SQLite index (rebuildable cache) via `rusqlite`. |
-| `leoht-scan` | Folder walking, format detection, hashing, EXIF, optional fs watching. |
+| `leoht-scan` | Folder walking, content checks, metadata (EXIF, header), damage records, hashing, optional fs watching. |
+| `leoht-library` | A library on disk: config, cache location, incremental scan into the catalog, rebuild (ADR-0006). |
 | `leoht-edit` | Sidecar persistence now; pixel edit pipeline in Phase 3. |
 | `leoht-thumb` | Thumbnails and the content-addressed cache layout. |
 | `leoht-cli` | `leoht` command-line driver (the Phase 1 demo front-end). |
-| `leoht-testkit` | Dev-only deterministic synthetic library generator. |
+| `leoht-testkit` | Dev-only deterministic synthetic library generator and fixture builders. |
 | `leoht-ui` | *Phase 2, not yet created:* egui front-end. |
 
 ## Develop

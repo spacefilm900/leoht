@@ -36,6 +36,36 @@ pub enum PhotoFormat {
 }
 
 impl PhotoFormat {
+    /// Every recognised format, in Phase 1 priority order.
+    pub const ALL: [Self; 6] = [
+        Self::Jpeg,
+        Self::Heic,
+        Self::Png,
+        Self::Raw,
+        Self::Tiff,
+        Self::Webp,
+    ];
+
+    /// Stable lower-case name (`"jpeg"`, `"raw"`): used in the catalog, the CLI
+    /// output and the library config. Decoupled from the Rust spelling on purpose.
+    #[must_use]
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::Jpeg => "jpeg",
+            Self::Heic => "heic",
+            Self::Png => "png",
+            Self::Raw => "raw",
+            Self::Tiff => "tiff",
+            Self::Webp => "webp",
+        }
+    }
+
+    /// Inverse of [`PhotoFormat::name`].
+    #[must_use]
+    pub fn from_name(name: &str) -> Option<Self> {
+        Self::ALL.into_iter().find(|f| f.name() == name)
+    }
+
     /// Classifies a file by its extension (case-insensitive, without the dot).
     #[must_use]
     pub fn from_extension(ext: &str) -> Option<Self> {
@@ -51,7 +81,12 @@ impl PhotoFormat {
         }
     }
 
-    /// The Phase 1 support level for this format.
+    /// The support level for this format in the format matrix (ADR-0004).
+    ///
+    /// HEIC is `Full` in the matrix, but Phase 1 builds only detect it and read
+    /// its metadata: decoding waits for the decoder spike and the G-legal gate,
+    /// and trial builds never decode it (SQ-1). JPEG and PNG are the only
+    /// formats Phase 1 decodes.
     #[must_use]
     pub fn support(self) -> FormatSupport {
         match self {
@@ -82,5 +117,21 @@ mod tests {
         assert_eq!(PhotoFormat::Png.support(), FormatSupport::Full);
         assert_eq!(PhotoFormat::Raw.support(), FormatSupport::Partial);
         assert_eq!(PhotoFormat::Tiff.support(), FormatSupport::DetectOnly);
+        assert_eq!(PhotoFormat::Webp.support(), FormatSupport::DetectOnly);
+    }
+
+    #[test]
+    fn names_are_stable_and_round_trip() {
+        let names: Vec<_> = PhotoFormat::ALL.iter().map(|f| f.name()).collect();
+        assert_eq!(names, ["jpeg", "heic", "png", "raw", "tiff", "webp"]);
+        for f in PhotoFormat::ALL {
+            assert_eq!(PhotoFormat::from_name(f.name()), Some(f));
+            // The serde spelling must equal the stable name (config files use both).
+            assert_eq!(
+                serde_json::to_string(&f).unwrap(),
+                format!("\"{}\"", f.name())
+            );
+        }
+        assert_eq!(PhotoFormat::from_name("gif"), None);
     }
 }

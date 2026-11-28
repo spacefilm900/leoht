@@ -64,7 +64,7 @@ fn scan_hash_and_index_a_large_library() {
         t.elapsed()
     );
     assert_eq!(report.photos.len(), expected);
-    assert_eq!(report.skipped, 0);
+    assert!(report.skipped.is_empty(), "{:?}", report.skipped);
 
     let t = Instant::now();
     for photo in &mut report.photos {

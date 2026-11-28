@@ -3,7 +3,8 @@
 use camino::Utf8PathBuf;
 use thiserror::Error;
 
-/// A scan or hash operation failed.
+/// A scan or hash operation failed as a whole. Problems with single files are
+/// not errors: they are recorded per file (skipped entries, damaged photos).
 #[derive(Debug, Error)]
 pub enum ScanError {
     /// A file or folder could not be read.
@@ -17,4 +18,12 @@ pub enum ScanError {
     /// The library root does not exist or is not a directory.
     #[error("library root {0} is not a directory")]
     NotADirectory(Utf8PathBuf),
+    /// The library config file exists but cannot be used.
+    #[error("library config {path} is not usable: {message}")]
+    Config {
+        /// The config file.
+        path: Utf8PathBuf,
+        /// What is wrong with it.
+        message: String,
+    },
 }

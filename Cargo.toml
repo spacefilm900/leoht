@@ -22,6 +22,7 @@ leoht-catalog = { path = "crates/leoht-catalog" }
 leoht-scan = { path = "crates/leoht-scan" }
 leoht-edit = { path = "crates/leoht-edit" }
 leoht-thumb = { path = "crates/leoht-thumb" }
+leoht-library = { path = "crates/leoht-library" }
 leoht-testkit = { path = "crates/leoht-testkit" }
 
 # --- runtime ---

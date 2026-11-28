@@ -137,7 +137,7 @@ Policy: only permissive licences in the default build, enforced by `cargo-deny` 
 | libsqlite3-sys 0.40.0 + bundled SQLite C source | compiles SQLite into the binary | 0–1 | sys crate MIT [C]; SQLite itself public domain [R: sqlite.org/copyright.html] | Fine; no attribution needed for SQLite. | in use |
 | image 0.25.10 (`jpeg`, `png` only) | decode/encode JPEG & PNG, resize | 0–1 | MIT OR Apache-2.0 [M] | Fine. HEIC/RAW are *not* part of it. | in use |
 | kamadak-exif 0.6.2 | EXIF reading | 0–1 | BSD-2-Clause [M] | Fine; keep the copyright notice in distributions. | in use |
-| ignore 0.4.35 | directory walking, `.leohtignore` | 0–1 | Unlicense OR MIT [M] | Fine (choose MIT). | in use |
+| ignore 0.4.35 | directory walking, ignore patterns from `leoht-library.json` (ADR-0006) | 0–1 | Unlicense OR MIT [M] | Fine (choose MIT). | in use |
 | notify 9.0.0 | filesystem watching (`watch` feature) | 1 | CC0-1.0 [M] | Fine (public-domain dedication). | in use (optional feature) |
 | blake3 1.8.8 | content hashing | 0–1 | CC0-1.0 OR Apache-2.0 OR Apache-2.0 WITH LLVM-exception [M] | Fine. | in use |
 | camino 1.2.6 | UTF-8 paths | 0 | MIT OR Apache-2.0 [M] | Fine. | in use |
