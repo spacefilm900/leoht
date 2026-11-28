@@ -89,12 +89,13 @@ pub fn set_tree_readonly(root: &Utf8Path, readonly: bool) {
     // contents, so deny the specific modify rights (write data / add file,
     // append data / add folder, write attributes and extended attributes,
     // delete, delete child) to Everyone with an inherited access-control entry,
-    // and remove it again afterwards. Not the generic `W`: it includes
-    // SYNCHRONIZE, which would also block opening and reading.
+    // and remove it again afterwards. Only specific rights (`DE`, not the
+    // simple `D` or `W`): the simple rights include SYNCHRONIZE, and denying
+    // that also blocks opening and listing the folder.
     #[cfg(windows)]
     {
         let args: &[&str] = if readonly {
-            &["/deny", "*S-1-1-0:(OI)(CI)(WD,AD,WEA,WA,D,DC)"]
+            &["/deny", "*S-1-1-0:(OI)(CI)(WD,AD,WEA,WA,DE,DC)"]
         } else {
             &["/remove:d", "*S-1-1-0", "/T", "/C"]
         };
