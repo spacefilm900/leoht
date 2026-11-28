@@ -34,6 +34,35 @@ allow = [
 multiple-versions = "warn" # tighten to "deny" once the dependency tree settles (Phase 1)
 wildcards = "deny"
 allow-wildcard-paths = true # path dependencies between workspace crates
+# FR-FND-08: no networking or telemetry in any build. These crates must not
+# appear anywhere in the dependency tree; a future opt-in network feature
+# needs an ADR and an explicit, reviewed exception here.
+deny = [
+    # HTTP clients and servers
+    { crate = "reqwest", reason = "FR-FND-08: no network access" },
+    { crate = "hyper", reason = "FR-FND-08: no network access" },
+    { crate = "h2", reason = "FR-FND-08: no network access" },
+    { crate = "ureq", reason = "FR-FND-08: no network access" },
+    { crate = "curl", reason = "FR-FND-08: no network access" },
+    { crate = "curl-sys", reason = "FR-FND-08: no network access" },
+    { crate = "isahc", reason = "FR-FND-08: no network access" },
+    { crate = "attohttpc", reason = "FR-FND-08: no network access" },
+    { crate = "surf", reason = "FR-FND-08: no network access" },
+    { crate = "awc", reason = "FR-FND-08: no network access" },
+    { crate = "tungstenite", reason = "FR-FND-08: no network access" },
+    # TLS stacks (only useful for talking to a network)
+    { crate = "rustls", reason = "FR-FND-08: no network access" },
+    { crate = "native-tls", reason = "FR-FND-08: no network access" },
+    { crate = "openssl", reason = "FR-FND-08: no network access" },
+    { crate = "openssl-sys", reason = "FR-FND-08: no network access" },
+    # Telemetry, crash reporting and analytics
+    { crate = "sentry", reason = "FR-FND-08: no telemetry" },
+    { crate = "opentelemetry", reason = "FR-FND-08: no telemetry" },
+    { crate = "opentelemetry-otlp", reason = "FR-FND-08: no telemetry" },
+    { crate = "tracing-opentelemetry", reason = "FR-FND-08: no telemetry" },
+    { crate = "posthog-rs", reason = "FR-FND-08: no telemetry" },
+    { crate = "segment", reason = "FR-FND-08: no telemetry" },
+]
 
 [sources]
 unknown-registry = "deny"

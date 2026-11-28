@@ -108,6 +108,20 @@ fn probe_into(
     check_size(meta)
 }
 
+/// The embedded JPEG preview of `path` (EXIF thumbnail, or a RAF's large
+/// preview), if it has a readable one. Used for RAW thumbnails, and as a fast
+/// path for JPEG thumbnails when the preview is big enough (FR-LIB-07).
+#[must_use]
+pub fn embedded_preview(path: &Utf8Path) -> Option<Vec<u8>> {
+    let mut file = File::open(path).ok()?;
+    let mut head = Vec::with_capacity(detect::HEAD_LEN);
+    (&mut file)
+        .take(detect::HEAD_LEN as u64)
+        .read_to_end(&mut head)
+        .ok()?;
+    exif_read::embedded_preview(&mut file, &head)
+}
+
 fn check_size(meta: &PhotoMeta) -> Result<(), Damage> {
     if let (Some(w), Some(h)) = (meta.width, meta.height) {
         let pixels = u64::from(w) * u64::from(h);

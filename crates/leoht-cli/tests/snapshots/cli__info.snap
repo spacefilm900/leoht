@@ -1,0 +1,52 @@
+---
+source: crates/leoht-cli/tests/cli.rs
+expression: info
+---
+{
+  "arch": "[arch]",
+  "cache_root": "[cache_root]",
+  "command": "info",
+  "formats": [
+    {
+      "decoded": "yes",
+      "format": "jpeg",
+      "support": "full"
+    },
+    {
+      "decoded": "no",
+      "format": "heic",
+      "support": "full"
+    },
+    {
+      "decoded": "yes",
+      "format": "png",
+      "support": "full"
+    },
+    {
+      "decoded": "embedded preview only",
+      "format": "raw",
+      "support": "partial"
+    },
+    {
+      "decoded": "no",
+      "format": "tiff",
+      "support": "detect_only"
+    },
+    {
+      "decoded": "no",
+      "format": "webp",
+      "support": "detect_only"
+    }
+  ],
+  "library": {
+    "cache_dir": "[LIBRARY CACHE]",
+    "damaged": 6,
+    "photos": 20,
+    "root": "[ROOT]",
+    "scanned": true
+  },
+  "network": "none: Leoht makes no network connections",
+  "os": "[os]",
+  "schema_version": 1,
+  "version": "[version]"
+}

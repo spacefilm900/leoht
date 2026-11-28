@@ -1,0 +1,7 @@
+---
+source: crates/leoht-cli/tests/cli.rs
+expression: text
+---
+missing: png/plain.png
+not indexed: new.jpg
+out of sync: run `leoht scan` to update the catalog

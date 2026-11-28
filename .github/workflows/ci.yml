@@ -68,8 +68,15 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-15, ubuntu-latest]
+    env:
+      # The no-network test (FR-FND-08) must run here, not skip: strace on
+      # Linux, sandbox-exec (built in) on macOS.
+      LEOHT_REQUIRE_NETWORK_CHECK: "1"
     steps:
       - uses: actions/checkout@v7
+      - name: Install strace (no-network recorder)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq strace
       - name: Install pinned toolchain
         run: rustup toolchain install
       - uses: Swatinem/rust-cache@v2
@@ -87,6 +94,20 @@ jobs:
         run: rustup toolchain install
       - uses: Swatinem/rust-cache@v2
       - run: cargo test --workspace --all-features --no-fail-fast
+
+  # FR-LIB-04 / SQ-1: the trial build (the `leoht` CLI, default features, as
+  # built for Apple Silicon) must not be able to decode HEIC, and no HEIC
+  # sample may ship with it. The list of forbidden crates and features lives
+  # next to the check in xtask/heic-decoding.txt.
+  trial-check:
+    name: trial build excludes HEIC decoding
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install pinned toolchain
+        run: rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo xtask check-trial
 
   deny:
     name: cargo-deny
@@ -115,7 +136,7 @@ jobs:
   ci-ok:
     name: CI OK
     if: always()
-    needs: [fmt, clippy, file-size, test, deny, docs]
+    needs: [fmt, clippy, file-size, test, trial-check, deny, docs]
     runs-on: ubuntu-latest
     steps:
       - name: Fail if any required job did not succeed

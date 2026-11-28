@@ -29,6 +29,12 @@ pub enum ThumbError {
         /// The destination path.
         path: Utf8PathBuf,
     },
+    /// The format cannot be decoded and the file has no usable embedded preview.
+    #[error("no thumbnail source for {path}: not decodable and no embedded preview")]
+    NoSource {
+        /// The source path.
+        path: Utf8PathBuf,
+    },
     /// The cache directory could not be created.
     #[error("cannot create cache directory {path}: {source}")]
     CacheDir {

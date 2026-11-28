@@ -17,6 +17,7 @@ thiserror.workspace = true
 
 [dev-dependencies]
 tempfile.workspace = true
+leoht-testkit.workspace = true
 
 [lints]
 workspace = true

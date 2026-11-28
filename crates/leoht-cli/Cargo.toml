@@ -17,11 +17,19 @@ path = "src/main.rs"
 leoht-core.workspace = true
 leoht-catalog.workspace = true
 leoht-scan.workspace = true
+leoht-library.workspace = true
+serde_json.workspace = true
 anyhow.workspace = true
 camino.workspace = true
 clap.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
+
+[dev-dependencies]
+leoht-testkit.workspace = true
+insta.workspace = true
+serde_json.workspace = true
+tempfile.workspace = true
 
 [lints]
 workspace = true

@@ -1,0 +1,65 @@
+---
+source: crates/leoht-cli/tests/cli.rs
+expression: "env.json(&[\"verify\"], 3)"
+---
+{
+  "changed": [],
+  "command": "verify",
+  "damaged": [
+    {
+      "damage": {
+        "detail": "the file is empty",
+        "kind": "empty"
+      },
+      "path": "damaged/empty.jpg"
+    },
+    {
+      "damage": {
+        "detail": "unexpected end of file",
+        "kind": "unreadable_header"
+      },
+      "path": "damaged/garbled.png"
+    },
+    {
+      "damage": {
+        "detail": "65000 x 65000 pixels is over the 400000000-pixel safety limit",
+        "kind": "too_large"
+      },
+      "path": "damaged/huge-dimensions.jpg"
+    },
+    {
+      "damage": {
+        "detail": "the content is not a valid raw file",
+        "kind": "content_mismatch"
+      },
+      "path": "damaged/noise.nef"
+    },
+    {
+      "damage": {
+        "detail": "the content is not a valid jpeg file",
+        "kind": "content_mismatch"
+      },
+      "path": "damaged/text-file.jpg"
+    },
+    {
+      "damage": {
+        "detail": "truncated before frame header",
+        "kind": "unreadable_header"
+      },
+      "path": "damaged/truncated.jpg"
+    }
+  ],
+  "elapsed_ms": 0,
+  "hash_mismatch": [],
+  "hashes_checked": 0,
+  "in_catalog": 20,
+  "in_sync": false,
+  "missing": [
+    "png/plain.png"
+  ],
+  "on_disk": 20,
+  "schema_version": 1,
+  "unindexed": [
+    "new.jpg"
+  ]
+}
