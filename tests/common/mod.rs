@@ -65,6 +65,11 @@ fn blake3_hex(bytes: &[u8]) -> String {
 
 /// Recursively sets `root` and everything in it read-only (or back to writable).
 pub fn set_tree_readonly(root: &Utf8Path, readonly: bool) {
+    // Unprotecting: lift the Windows deny entry first, because it also denies
+    // changing the read-only attribute itself.
+    if !readonly {
+        windows_deny_writes(root, false);
+    }
     let mut paths = vec![root.to_owned()];
     let mut i = 0;
     while i < paths.len() {
@@ -85,16 +90,23 @@ pub fn set_tree_readonly(root: &Utf8Path, readonly: bool) {
         perms.set_readonly(readonly);
         std::fs::set_permissions(p, perms).expect("chmod");
     }
-    // On Windows the read-only attribute does not stop changes to a folder's
-    // contents, so deny the specific modify rights (write data / add file,
-    // append data / add folder, write attributes and extended attributes,
-    // delete, delete child) to Everyone with an inherited access-control entry,
-    // and remove it again afterwards. Only specific rights (`DE`, not the
-    // simple `D` or `W`): the simple rights include SYNCHRONIZE, and denying
-    // that also blocks opening and listing the folder.
+    if readonly {
+        windows_deny_writes(root, true);
+    }
+}
+
+/// On Windows the read-only attribute does not stop changes to a folder's
+/// contents, so deny the specific modify rights (write data / add file,
+/// append data / add folder, write attributes and extended attributes,
+/// delete, delete child) to Everyone with an inherited access-control entry,
+/// or remove that entry again. Only specific rights (`DE`, not the simple `D`
+/// or `W`): the simple rights include SYNCHRONIZE, and denying that also
+/// blocks opening and listing the folder. A no-op elsewhere.
+#[cfg_attr(not(windows), allow(unused_variables))]
+fn windows_deny_writes(root: &Utf8Path, deny: bool) {
     #[cfg(windows)]
     {
-        let args: &[&str] = if readonly {
+        let args: &[&str] = if deny {
             &["/deny", "*S-1-1-0:(OI)(CI)(WD,AD,WEA,WA,DE,DC)"]
         } else {
             &["/remove:d", "*S-1-1-0", "/T", "/C"]
