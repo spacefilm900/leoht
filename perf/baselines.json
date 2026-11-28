@@ -1,4 +1,51 @@
 {
   "rule": "FR-FND-07: a metric more than 25% slower than its baseline fails the volume check, unless the difference is under 100 ms (noise floor). Baselines are recorded from CI runs of volume.yml; changing them is a reviewed PR that links the run.",
-  "platforms": {}
+  "platforms": {
+    "macos-15": {
+      "1000": {
+        "cold_scan": 413.4,
+        "first_500_visible": 294.9,
+        "rebuild": 27.2,
+        "rescan_10_changed": 4.9,
+        "rescan_no_change": 3.9,
+        "thumbnails": 4954.8,
+        "warm_start": 1.6
+      },
+      "10000": {
+        "cold_scan": 5151.1,
+        "first_500_visible": 715.4,
+        "rebuild": 448.5,
+        "rescan_10_changed": 41.2,
+        "rescan_no_change": 100.2,
+        "thumbnails": 28029.1,
+        "warm_start": 21.9
+      }
+    },
+    "ubuntu": {
+      "1000": {
+        "cold_scan": 236.2,
+        "first_500_visible": 122.6,
+        "rebuild": 20.5,
+        "rescan_10_changed": 4.7,
+        "rescan_no_change": 4.3,
+        "thumbnails": 3018.6,
+        "warm_start": 1.5
+      },
+      "10000": {
+        "cold_scan": 2497.7,
+        "first_500_visible": 143.1,
+        "rebuild": 213.2,
+        "rescan_10_changed": 42.3,
+        "rescan_no_change": 41.6,
+        "thumbnails": 30199.0,
+        "warm_start": 16.6
+      }
+    }
+  },
+  "source": {
+    "run": "https://github.com/spacefilm900/leoht/actions/runs/46125712164",
+    "commit": "672ac59 (PR #6 before rebase; the measured code is unchanged by the rebase)",
+    "recorded": "2026-11-28",
+    "note": "One run per platform on GitHub-hosted runners (macos-15: aarch64, 3 CPUs; ubuntu-latest: x86_64, 4 CPUs). Synthetic library: 640x480 JPEGs, much smaller than real camera files."
+  }
 }
